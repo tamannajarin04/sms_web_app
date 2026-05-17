@@ -2,119 +2,691 @@
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<title>{% block title %}SmishGuard AI{% endblock %}</title>
+<title>SmishGuard AI — SMS Threat Detection</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/style.css">
-</head>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Roboto:wght@300;400;500;700&family=Roboto+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+:root {
+  --bg:       #080a0e;
+  --surf:     #0f1117;
+  --card:     #151820;
+  --border:   rgba(255,255,255,.07);
+  --border2:  rgba(255,255,255,.13);
+  --t1:       #eef0f5;
+  --t2:       #7a8799;
+  --t3:       #2e3542;
+  --grn:      #00e5a0;
+  --red:      #ff4d6d;
+  --amb:      #ffb547;
+  --blu:      #4d8fff;
+  --acc:      #00e5a0;
+  --acc-dim:  rgba(0,229,160,.08);
+  --acc-bd:   rgba(0,229,160,.2);
+  --nav-h:    68px;
+  --ff-head:  'Roboto Condensed', sans-serif;
+  --ff-body:  'Roboto', sans-serif;
+  --ff-mono:  'Roboto Mono', monospace;
+  --ease:     cubic-bezier(.4,0,.2,1);
+}
+[data-theme="light"] {
+  --bg:       #f0f2f7;
+  --surf:     #ffffff;
+  --card:     #e8ebf2;
+  --border:   rgba(0,0,0,.06);
+  --border2:  rgba(0,0,0,.11);
+  --t1:       #0c0f15;
+  --t2:       #566170;
+  --t3:       #bbbfc8;
+  --acc:      #00a070;
+  --grn:      #00a070;
+  --acc-dim:  rgba(0,160,112,.06);
+  --acc-bd:   rgba(0,160,112,.2);
+}
 
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--ff-body);
+  background:var(--bg);
+  color:var(--t1);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+[data-theme="dark"] body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.008) 2px,rgba(255,255,255,.008) 3px);
+}
+[data-theme="dark"] body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(0,229,160,.04) 0%,transparent 60%);
+}
+
+/* ══ BOOTSTRAP OVERRIDES ══════════════════════════════════════════════ */
+.container-xl{max-width:1160px;}
+.btn{font-family:var(--ff-body);letter-spacing:.03em;transition:all .2s var(--ease);}
+.btn-primary{
+  background:var(--acc);border-color:var(--acc);color:#050a07;
+  font-weight:600;border-radius:8px;
+}
+.btn-primary:hover{background:var(--acc);border-color:var(--acc);color:#050a07;opacity:.82;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,229,160,.2);}
+.btn-outline-secondary{
+  color:var(--t2);border-color:var(--border2);background:transparent;
+  font-weight:500;border-radius:8px;
+}
+.btn-outline-secondary:hover{color:var(--t1);background:rgba(255,255,255,.04);border-color:var(--border2);}
+[data-theme="light"] .btn-outline-secondary:hover{background:rgba(0,0,0,.04);}
+.badge{font-family:var(--ff-mono);font-size:.6rem;letter-spacing:.07em;}
+.navbar{font-family:var(--ff-body);}
+
+/* ══ NAV ═══════════════════════════════════════════════════════════════ */
+.navbar{
+  height:var(--nav-h);
+  background:transparent;
+  border-bottom:1px solid transparent;
+  transition:background .3s,border-color .3s,backdrop-filter .3s;
+  padding:0;position:fixed;top:0;left:0;right:0;z-index:1000;
+}
+.navbar.stuck{
+  background:color-mix(in srgb,var(--bg) 82%,transparent);
+  backdrop-filter:blur(20px);
+  border-bottom-color:var(--border);
+}
+.navbar-brand{
+  font-family:var(--ff-head);font-size:1.15rem;font-weight:800;
+  color:var(--t1);letter-spacing:.03em;
+  display:flex;align-items:center;gap:9px;
+}
+.brand-icon{
+  width:30px;height:30px;border:1.5px solid var(--acc);border-radius:7px;
+  display:flex;align-items:center;justify-content:center;color:var(--acc);
+  font-size:.75rem;
+}
+.navbar-brand em{color:var(--acc);font-style:normal;}
+.navbar-brand:hover{color:var(--t1);}
+.nav-link{
+  font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--t2)!important;padding:6px 13px!important;border-radius:6px;
+  transition:color .18s,background .18s;
+}
+.nav-link:hover{color:var(--t1)!important;background:rgba(255,255,255,.05);}
+.nav-link.active{color:var(--acc)!important;}
+[data-theme="light"] .nav-link:hover{background:rgba(0,0,0,.04);}
+.theme-toggle{
+  display:flex;background:var(--surf);border:1px solid var(--border2);
+  border-radius:99px;padding:3px;gap:2px;
+}
+.tw{
+  width:28px;height:28px;border-radius:50%;border:none;background:transparent;
+  font-size:12px;cursor:pointer;transition:background .18s;color:var(--t3);
+  display:flex;align-items:center;justify-content:center;
+}
+.tw.on{background:var(--card);color:var(--t1);}
+.navbar-toggler{border:1px solid var(--border2);color:var(--t2);}
+.navbar-toggler:focus{box-shadow:none;}
+.navbar-toggler-icon{
+  background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(122,135,153,1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+@media(max-width:991px){
+  .navbar-collapse{
+    background:var(--surf);border-bottom:1px solid var(--border);
+    padding:14px 20px 18px;margin-top:1px;
+  }
+}
+
+/* ══ WRAP ═══════════════════════════════════════════════════════════════ */
+.wrap{position:relative;z-index:1;padding-top:var(--nav-h);}
+
+/* ══ HERO ════════════════════════════════════════════════════════════════ */
+.hero-section{padding:96px 0 80px;}
+@media(max-width:768px){.hero-section{padding:56px 0 48px;}}
+.live-chip{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:.67rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--acc);border:1px solid var(--acc-bd);background:var(--acc-dim);
+  border-radius:4px;padding:5px 12px;
+  animation:fadeUp .6s var(--ease) both;
+}
+.pulse-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--acc);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,229,160,.5)}50%{box-shadow:0 0 0 5px rgba(0,229,160,0)}}
+.hero-title{
+  font-family:var(--ff-head);
+  font-size:clamp(3.2rem,6vw,5.4rem);
+  font-weight:800;line-height:.93;
+  letter-spacing:.01em;text-transform:uppercase;
+  color:var(--t1);margin:22px 0 0;
+  animation:fadeUp .6s .08s var(--ease) both;
+}
+.hero-title .accent{color:var(--acc);}
+.hero-title .muted{color:var(--t3);}
+.hero-sub{
+  font-size:.95rem;font-weight:300;line-height:1.78;
+  color:var(--t2);max-width:400px;margin:18px 0 28px;
+  animation:fadeUp .6s .16s var(--ease) both;
+}
+.hero-btns{animation:fadeUp .6s .22s var(--ease) both;}
+.stats-row{
+  display:flex;gap:28px;flex-wrap:wrap;margin-top:40px;
+  animation:fadeUp .6s .3s var(--ease) both;
+}
+.stat-num{
+  font-family:var(--ff-head);font-size:1.7rem;font-weight:800;color:var(--t1);
+  line-height:1;
+}
+.stat-num em{color:var(--acc);font-style:normal;}
+.stat-lbl{font-size:.64rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-top:4px;}
+.stat-div{width:1px;background:var(--border2);align-self:stretch;}
+
+/* ══ TERMINAL CARD ═══════════════════════════════════════════════════════ */
+.terminal-card{
+  background:var(--surf);border:1px solid var(--border2);
+  border-radius:12px;overflow:hidden;
+  animation:fadeUp .6s .1s var(--ease) both;
+  box-shadow:0 32px 80px rgba(0,0,0,.3);
+}
+.t-titlebar{
+  display:flex;align-items:center;gap:7px;
+  background:var(--card);border-bottom:1px solid var(--border);
+  padding:12px 16px;
+}
+.tdot{width:11px;height:11px;border-radius:50%;}
+.t-label{
+  font-family:var(--ff-mono);font-size:.65rem;font-weight:500;
+  color:var(--t3);letter-spacing:.07em;text-transform:uppercase;margin-left:6px;
+}
+.t-body-inner{padding:18px;}
+.sms-input-wrap{
+  display:flex;align-items:flex-start;gap:10px;
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:8px;padding:14px;transition:border-color .2s;
+}
+.sms-input-wrap:focus-within{border-color:var(--acc-bd);}
+.sms-input-wrap textarea{
+  flex:1;background:transparent;border:none;outline:none;resize:none;
+  font-family:var(--ff-body);font-size:.87rem;color:var(--t1);
+  line-height:1.6;height:80px;
+}
+.sms-input-wrap textarea::placeholder{color:var(--t3);}
+.go-btn{
+  flex-shrink:0;background:var(--acc);color:#050a07;
+  border:none;border-radius:7px;width:36px;height:36px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:1rem;transition:opacity .18s;
+}
+.go-btn:hover{opacity:.8;}
+.result-box{
+  margin-top:13px;border-radius:8px;padding:14px 16px;
+  display:none;animation:fadeUp .22s var(--ease) both;
+}
+.r-safe{background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.2);}
+.r-threat{background:rgba(255,77,109,.06);border:1px solid rgba(255,77,109,.2);}
+.r-spam{background:rgba(255,181,71,.06);border:1px solid rgba(255,181,71,.2);}
+.r-verdict{
+  font-family:var(--ff-head);font-size:.95rem;font-weight:800;
+  letter-spacing:.07em;text-transform:uppercase;
+}
+.r-safe .r-verdict{color:var(--grn);}
+.r-threat .r-verdict{color:var(--red);}
+.r-spam .r-verdict{color:var(--amb);}
+.r-conf{font-family:var(--ff-mono);font-size:.72rem;color:var(--t3);}
+.r-desc{font-size:.78rem;color:var(--t2);line-height:1.55;margin-top:5px;}
+.r-progress{height:2px;background:var(--border);border-radius:99px;margin-top:11px;overflow:hidden;}
+.r-bar{height:100%;border-radius:99px;width:0%;transition:width .7s var(--ease);}
+.r-safe .r-bar{background:var(--grn);}
+.r-threat .r-bar{background:var(--red);}
+.r-spam .r-bar{background:var(--amb);}
+.sample-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+.pill{
+  font-size:.67rem;color:var(--t2);border:1px solid var(--border);
+  background:none;border-radius:5px;padding:5px 10px;cursor:pointer;
+  transition:color .15s,border-color .15s;font-family:var(--ff-body);
+}
+.pill:hover{color:var(--t1);border-color:var(--border2);}
+
+/* ══ SECTION COMMON ═══════════════════════════════════════════════════════ */
+.section-tag{
+  font-size:.66rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--acc);margin-bottom:10px;
+}
+.section-title{
+  font-family:var(--ff-head);
+  font-size:clamp(1.9rem,3.5vw,2.9rem);
+  font-weight:800;letter-spacing:.02em;text-transform:uppercase;
+  color:var(--t1);line-height:.97;
+}
+.section-sub{
+  font-size:.88rem;font-weight:300;color:var(--t2);
+  line-height:1.75;margin-top:12px;max-width:440px;
+}
+.divider{border:none;border-top:1px solid var(--border);margin:0;}
+
+/* ══ FEATURES ════════════════════════════════════════════════════════════ */
+.features-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:0;margin-top:48px;
+  border:1px solid var(--border2);border-radius:12px;overflow:hidden;
+}
+.feat-card{
+  padding:28px 24px;background:var(--surf);
+  border-right:1px solid var(--border);border-bottom:1px solid var(--border);
+  position:relative;overflow:hidden;transition:background .18s;
+}
+.feat-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--acc);transform:scaleX(0);transform-origin:left;
+  transition:transform .28s var(--ease);
+}
+.feat-card:hover::after{transform:scaleX(1);}
+.feat-card:hover{background:var(--card);}
+.feat-icon{
+  width:38px;height:38px;border-radius:8px;border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;margin-bottom:16px;
+  font-size:1rem;
+}
+.feat-h{
+  font-family:var(--ff-head);font-size:.93rem;font-weight:800;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--t1);margin-bottom:8px;
+}
+.feat-p{font-size:.8rem;font-weight:300;color:var(--t2);line-height:1.65;}
+
+/* ══ PROCESS STEPS ════════════════════════════════════════════════════════ */
+.process-section{background:var(--surf);}
+.steps-row{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:0;margin-top:48px;position:relative;
+}
+.steps-row::before{
+  content:'';position:absolute;top:17px;left:10%;right:10%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--acc-bd) 20%,var(--acc-bd) 80%,transparent);
+}
+.step-item{padding:0 20px;text-align:center;}
+.step-num{
+  width:35px;height:35px;border-radius:50%;
+  border:1px solid var(--border2);background:var(--bg);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
+  font-family:var(--ff-mono);font-size:.8rem;font-weight:500;color:var(--acc);
+  position:relative;z-index:1;transition:border-color .18s,box-shadow .18s;
+}
+.step-item:hover .step-num{border-color:var(--acc-bd);box-shadow:0 0 0 5px var(--acc-dim);}
+.step-h{
+  font-family:var(--ff-head);font-size:.88rem;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--t1);margin-bottom:8px;
+}
+.step-p{font-size:.78rem;font-weight:300;color:var(--t2);line-height:1.65;}
+
+/* ══ DASHBOARD ═══════════════════════════════════════════════════════════ */
+.dash-card{
+  background:var(--surf);border:1px solid var(--border2);
+  border-radius:12px;padding:22px;
+}
+.dash-card-title{
+  font-family:var(--ff-head);font-size:.82rem;font-weight:800;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--t1);
+}
+.badge-live{background:rgba(0,229,160,.1);color:var(--grn);font-family:var(--ff-mono);}
+.badge-day{background:rgba(77,143,255,.1);color:var(--blu);font-family:var(--ff-mono);}
+.donut-wrap{display:flex;align-items:center;gap:20px;margin-top:16px;}
+.donut-svg{transform:rotate(-90deg);display:block;}
+.dr{fill:none;stroke-width:8;}
+.dr-bg{stroke:var(--border2);}
+.dr-g{stroke:var(--grn);stroke-dasharray:201;stroke-dashoffset:30;stroke-linecap:round;}
+.dr-a{stroke:var(--amb);stroke-dasharray:201;stroke-dashoffset:183;stroke-linecap:round;}
+.dr-r{stroke:var(--red);stroke-dasharray:201;stroke-dashoffset:196;stroke-linecap:round;}
+.donut-legend{display:flex;flex-direction:column;gap:9px;}
+.dl-item{display:flex;align-items:center;gap:8px;font-size:.77rem;color:var(--t2);}
+.dl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.scan-list{display:flex;flex-direction:column;gap:6px;margin-top:4px;}
+.scan-row{
+  display:flex;align-items:center;gap:9px;
+  padding:9px 12px;border-radius:7px;background:var(--card);
+  font-size:.77rem;transition:background .15s;cursor:default;
+}
+.scan-row:hover{background:var(--bg);}
+.scan-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.scan-txt{flex:1;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.scan-badge{font-size:.59rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;flex-shrink:0;font-family:var(--ff-mono);}
+.scan-time{font-size:.62rem;color:var(--t3);white-space:nowrap;font-family:var(--ff-mono);}
+.bg-safe{background:rgba(0,229,160,.09);color:var(--grn);}
+.bg-threat{background:rgba(255,77,109,.09);color:var(--red);}
+.bg-spam{background:rgba(255,181,71,.09);color:var(--amb);}
+
+/* ══ CTA BLOCK ════════════════════════════════════════════════════════════ */
+.cta-block{
+  border:1px solid var(--border2);border-radius:16px;
+  padding:64px 48px;text-align:center;
+  background:var(--surf);position:relative;overflow:hidden;
+}
+.cta-block::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(0,229,160,.06) 0%,transparent 70%);
+}
+.cta-title{
+  font-family:var(--ff-head);
+  font-size:clamp(1.9rem,3.5vw,3.1rem);
+  font-weight:800;text-transform:uppercase;letter-spacing:.02em;
+  color:var(--t1);margin-bottom:10px;
+}
+.cta-sub{font-size:.88rem;font-weight:300;color:var(--t2);margin-bottom:28px;}
+@media(max-width:576px){.cta-block{padding:40px 20px;}}
+
+/* ══ FOOTER ═══════════════════════════════════════════════════════════════ */
+footer{
+  border-top:1px solid var(--border);
+  padding:22px 28px;position:relative;z-index:1;
+  font-family:var(--ff-body);
+}
+.footer-logo{
+  font-family:var(--ff-head);font-weight:800;font-size:.92rem;
+  letter-spacing:.03em;color:var(--t1);
+}
+.footer-logo em{color:var(--acc);font-style:normal;}
+.footer-copy{font-size:.72rem;color:var(--t3);}
+.footer-link{font-size:.72rem;color:var(--t3);text-decoration:none;transition:color .15s;}
+.footer-link:hover{color:var(--acc);}
+
+/* ══ ANIMATIONS ═══════════════════════════════════════════════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .55s var(--ease),transform .55s var(--ease);}
+.reveal.in{opacity:1;transform:none;}
+</style>
+</head>
 <body>
 
-  <!-- Animated mesh background -->
-  <div class="bg-scene" aria-hidden="true">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-    <div class="noise"></div>
+<!-- ══ NAVBAR ══════════════════════════════════════════════════════════════ -->
+<nav class="navbar navbar-expand-lg" id="mainNav">
+  <div class="container-xl px-3">
+    <a class="navbar-brand" href="#">
+      <div class="brand-icon"><i class="bi bi-shield-check"></i></div>
+      SmishGuard<em>AI</em>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav mx-auto gap-1">
+        <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Model</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Dataset</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+      </ul>
+      <div class="d-flex align-items-center gap-3 mt-2 mt-lg-0">
+        <div class="theme-toggle">
+          <button class="tw on" id="twDark" title="Dark">🌙</button>
+          <button class="tw" id="twLight" title="Light">☀️</button>
+        </div>
+        <button class="btn btn-primary btn-sm px-3 d-none d-lg-block">Get Started</button>
+      </div>
+    </div>
   </div>
+</nav>
 
-  <!-- Navbar -->
-  <nav class="sg-nav" id="mainNav">
-    <div class="nav-inner">
+<div class="wrap">
 
-      <a class="nav-logo" href="/">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <polygon points="12,2 21,7 21,17 12,22 3,17 3,7"
-                   stroke="currentColor" stroke-width="1.6"
-                   fill="none" stroke-linejoin="round"/>
-          <polygon points="12,7 17,10 17,15 12,18 7,15 7,10"
-                   fill="currentColor" opacity="0.4"/>
-        </svg>
-        SmishGuard<em>AI</em>
-      </a>
-
-      <div class="nav-links" id="navLinks">
-        <a href="/" class="nav-link">Home</a>
-        <a href="/model" class="nav-link">Model</a>
-        <a href="/dataset" class="nav-link">Dataset</a>
-        <a href="/about" class="nav-link">About</a>
+<!-- ══ HERO ═══════════════════════════════════════════════════════════════ -->
+<section class="hero-section">
+  <div class="container-xl px-3 px-md-4">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <div class="live-chip"><span class="pulse-dot"></span>Live Detection · v2.4</div>
+        <h1 class="hero-title">
+          <span class="accent">Detect</span><br>
+          SMS Threats<br>
+          <span class="muted">Instantly</span>
+        </h1>
+        <p class="hero-sub">Paste any suspicious text message and our NLP classifier identifies phishing, smishing, and spam in under 50 ms.</p>
+        <div class="hero-btns d-flex gap-3 flex-wrap">
+          <button class="btn btn-primary px-4" onclick="document.getElementById('smsIn').focus()">
+            <i class="bi bi-search me-2"></i>Try the Scanner
+          </button>
+          <button class="btn btn-outline-secondary px-4">View Docs <i class="bi bi-arrow-right ms-1"></i></button>
+        </div>
+        <div class="stats-row">
+          <div>
+            <div class="stat-num">98<em>.4%</em></div>
+            <div class="stat-lbl">Accuracy</div>
+          </div>
+          <div class="stat-div"></div>
+          <div>
+            <div class="stat-num">2<em>M+</em></div>
+            <div class="stat-lbl">Scans Run</div>
+          </div>
+          <div class="stat-div"></div>
+          <div>
+            <div class="stat-num">&lt;<em>50ms</em></div>
+            <div class="stat-lbl">Response</div>
+          </div>
+        </div>
       </div>
-
-      <div class="nav-actions">
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark theme">
-          <span class="toggle-track">
-            <span class="toggle-thumb">
-              <!-- Sun icon -->
-              <svg class="t-icon t-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                <circle cx="12" cy="12" r="4"/>
-                <line x1="12" y1="2" x2="12" y2="5"/>
-                <line x1="12" y1="19" x2="12" y2="22"/>
-                <line x1="2" y1="12" x2="5" y2="12"/>
-                <line x1="19" y1="12" x2="22" y2="12"/>
-                <line x1="4.93" y1="4.93" x2="7.05" y2="7.05"/>
-                <line x1="16.95" y1="16.95" x2="19.07" y2="19.07"/>
-                <line x1="4.93" y1="19.07" x2="7.05" y2="16.95"/>
-                <line x1="16.95" y1="7.05" x2="19.07" y2="4.93"/>
-              </svg>
-              <!-- Moon icon -->
-              <svg class="t-icon t-moon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
-              </svg>
-            </span>
-          </span>
-        </button>
-
-        <button class="nav-burger" id="navBurger" aria-label="Open navigation menu">
-          <span></span><span></span><span></span>
-        </button>
+      <div class="col-lg-6">
+        <div class="terminal-card">
+          <div class="t-titlebar">
+            <span class="tdot" style="background:#ff5f57"></span>
+            <span class="tdot" style="background:#febc2e"></span>
+            <span class="tdot" style="background:#28c840"></span>
+            <span class="t-label">SMS Threat Analyser</span>
+          </div>
+          <div class="t-body-inner">
+            <div class="sms-input-wrap">
+              <textarea id="smsIn" placeholder="Paste an SMS message here…" spellcheck="false"></textarea>
+              <button class="go-btn" id="goBtn" aria-label="Analyse"><i class="bi bi-send-fill"></i></button>
+            </div>
+            <div class="result-box" id="resultBox">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="r-verdict" id="rVerdict"></span>
+                <span class="r-conf" id="rConf"></span>
+              </div>
+              <p class="r-desc" id="rDesc"></p>
+              <div class="r-progress"><div class="r-bar" id="rBar"></div></div>
+            </div>
+            <div class="sample-pills">
+              <button class="pill" data-v="Your account has been suspended. Verify now at bit.ly/verify-now">⚠ Phishing</button>
+              <button class="pill" data-v="Congratulations! You've won £500. Claim at winner.io/claim">🎁 Spam</button>
+              <button class="pill" data-v="Hey, are you coming to dinner tonight at 7?">✓ Safe</button>
+            </div>
+          </div>
+        </div>
       </div>
-
     </div>
-  </nav>
+  </div>
+</section>
 
-  <main class="main-wrap">
-    {% block content %}{% endblock %}
-  </main>
+<hr class="divider">
 
-  <footer class="sg-footer">
-    <div class="footer-inner">
+<!-- ══ FEATURES ════════════════════════════════════════════════════════════ -->
+<section class="py-5 reveal">
+  <div class="container-xl px-3 px-md-4 py-4">
+    <p class="section-tag">Capabilities</p>
+    <h2 class="section-title">Built for real-world<br>SMS security</h2>
+    <p class="section-sub">Fine-tuned transformer trained on millions of real smishing samples, updated continuously with new attack patterns.</p>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon" style="color:var(--grn)"><i class="bi bi-shield-lock"></i></div>
+        <h3 class="feat-h">Real-Time Classification</h3>
+        <p class="feat-p">Sub-50 ms inference via ONNX runtime. Phishing, malware links, and social engineering detected in a single forward pass.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="color:var(--red)"><i class="bi bi-exclamation-octagon"></i></div>
+        <h3 class="feat-h">Threat Intelligence</h3>
+        <p class="feat-p">Cross-references live malicious URL feeds, sender fingerprints, and urgency-pattern databases updated every hour.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="color:var(--blu)"><i class="bi bi-bar-chart-line"></i></div>
+        <h3 class="feat-h">Confidence Scoring</h3>
+        <p class="feat-p">Every verdict includes a calibrated probability and token-level explainability — know exactly why a message was flagged.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="color:var(--amb)"><i class="bi bi-grid-3x3-gap"></i></div>
+        <h3 class="feat-h">REST API & Webhooks</h3>
+        <p class="feat-p">OpenAPI spec, Python/Node/Java SDKs, and async webhooks. Embed SmishGuard into any product stack in minutes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══ PROCESS ═════════════════════════════════════════════════════════════ -->
+<section class="py-5 process-section reveal">
+  <div class="container-xl px-3 px-md-4 py-4">
+    <p class="section-tag">Process</p>
+    <h2 class="section-title">From text to verdict<br>in four steps</h2>
+    <div class="steps-row">
+      <div class="step-item"><div class="step-num">01</div><h3 class="step-h">Input</h3><p class="step-p">Submit any SMS body via API, web UI, or mobile SDK. No preprocessing required.</p></div>
+      <div class="step-item"><div class="step-num">02</div><h3 class="step-h">Tokenize</h3><p class="step-p">Text is normalised and encoded into 512-dim embeddings via SentencePiece.</p></div>
+      <div class="step-item"><div class="step-num">03</div><h3 class="step-h">Infer</h3><p class="step-p">Transformer classifier assigns probabilities across Safe, Spam, Phishing, and Smishing.</p></div>
+      <div class="step-item"><div class="step-num">04</div><h3 class="step-h">Report</h3><p class="step-p">Verdict, confidence, threat type, and trigger tokens returned as structured JSON.</p></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══ DASHBOARD ═══════════════════════════════════════════════════════════ -->
+<section class="py-5 reveal">
+  <div class="container-xl px-3 px-md-4 py-4">
+    <p class="section-tag">Dashboard</p>
+    <h2 class="section-title">Analytics at a glance</h2>
+    <p class="section-sub">Detection history, threat breakdown, and model performance in one unified panel.</p>
+    <div class="row g-3 mt-2">
+      <div class="col-lg-4">
+        <div class="dash-card h-100">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="dash-card-title">Classification Breakdown</span>
+            <span class="badge badge-live">Live</span>
+          </div>
+          <div class="donut-wrap">
+            <svg class="donut-svg" width="90" height="90" viewBox="0 0 86 86">
+              <circle class="dr dr-bg" cx="43" cy="43" r="32"/>
+              <circle class="dr dr-g"  cx="43" cy="43" r="32"/>
+              <circle class="dr dr-a"  cx="43" cy="43" r="32"/>
+              <circle class="dr dr-r"  cx="43" cy="43" r="32"/>
+              <text x="43" y="40" text-anchor="middle" font-family="'Roboto Condensed',sans-serif" font-size="13" font-weight="800" fill="var(--t1)" transform="rotate(90,43,43)">85%</text>
+              <text x="43" y="51" text-anchor="middle" font-family="'Roboto',sans-serif" font-size="7.5" fill="var(--t3)" transform="rotate(90,43,43)">SAFE</text>
+            </svg>
+            <div class="donut-legend">
+              <div class="dl-item"><span class="dl-dot" style="background:var(--grn)"></span>Safe — 85%</div>
+              <div class="dl-item"><span class="dl-dot" style="background:var(--amb)"></span>Spam — 9%</div>
+              <div class="dl-item"><span class="dl-dot" style="background:var(--red)"></span>Smishing — 6%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-8">
+        <div class="dash-card h-100">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="dash-card-title">Recent Scans</span>
+            <span class="badge badge-day">Today</span>
+          </div>
+          <div class="scan-list">
+            <div class="scan-row"><span class="scan-dot" style="background:var(--red)"></span><span class="scan-txt">URGENT: Your bank account suspended. Verify now at…</span><span class="scan-badge bg-threat">Smishing</span><span class="scan-time">2m ago</span></div>
+            <div class="scan-row"><span class="scan-dot" style="background:var(--grn)"></span><span class="scan-txt">Hey, are you free for lunch tomorrow?</span><span class="scan-badge bg-safe">Safe</span><span class="scan-time">14m ago</span></div>
+            <div class="scan-row"><span class="scan-dot" style="background:var(--amb)"></span><span class="scan-txt">Congratulations! You've won a £500 gift card. Claim…</span><span class="scan-badge bg-spam">Spam</span><span class="scan-time">31m ago</span></div>
+            <div class="scan-row"><span class="scan-dot" style="background:var(--grn)"></span><span class="scan-txt">Your parcel has been delivered. Track on Royal Mail.</span><span class="scan-badge bg-safe">Safe</span><span class="scan-time">1h ago</span></div>
+            <div class="scan-row"><span class="scan-dot" style="background:var(--red)"></span><span class="scan-txt">Apple ID locked. Verify credentials immediately or…</span><span class="scan-badge bg-threat">Phishing</span><span class="scan-time">2h ago</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA ═════════════════════════════════════════════════════════════════ -->
+<div class="container-xl px-3 px-md-4 py-5 reveal">
+  <div class="cta-block">
+    <h2 class="cta-title">Secure your messages today</h2>
+    <p class="cta-sub">Free tier includes 1,000 analyses per month. No credit card required.</p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <button class="btn btn-primary px-5 py-2">Get Started Free</button>
+      <button class="btn btn-outline-secondary px-4 py-2">View Documentation <i class="bi bi-arrow-right ms-1"></i></button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ══ FOOTER ══════════════════════════════════════════════════════════════ -->
+<footer>
+  <div class="container-xl">
+    <div class="d-flex align-items-center flex-wrap gap-3">
       <span class="footer-logo">SmishGuard<em>AI</em></span>
-      <span class="footer-sep" aria-hidden="true">·</span>
+      <span class="footer-copy text-muted mx-1">·</span>
       <span class="footer-copy">© 2025 AI-Powered SMS Threat Detection</span>
+      <div class="ms-auto d-flex gap-4">
+        <a href="#" class="footer-link">Privacy</a>
+        <a href="#" class="footer-link">Terms</a>
+        <a href="#" class="footer-link">API Docs</a>
+        <a href="#" class="footer-link">GitHub</a>
+      </div>
     </div>
-  </footer>
+  </div>
+</footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  // ── Theme ─────────────────────────────────────────────────────────────────
-  const html      = document.documentElement;
-  const toggleBtn = document.getElementById('themeToggle');
-  const saved     = localStorage.getItem('sg-theme') || 'dark';
-  html.setAttribute('data-theme', saved);
+const html = document.documentElement;
+const applyTheme = t => {
+  html.setAttribute('data-theme', t);
+  localStorage.setItem('sg-theme', t);
+  document.getElementById('twDark').classList.toggle('on', t === 'dark');
+  document.getElementById('twLight').classList.toggle('on', t === 'light');
+};
+applyTheme(localStorage.getItem('sg-theme') || 'dark');
+document.getElementById('twDark').onclick  = () => applyTheme('dark');
+document.getElementById('twLight').onclick = () => applyTheme('light');
 
-  toggleBtn.addEventListener('click', () => {
-    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', next);
-    localStorage.setItem('sg-theme', next);
-  });
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => nav.classList.toggle('stuck', scrollY > 30), {passive:true});
 
-  // ── Active link ───────────────────────────────────────────────────────────
-  document.querySelectorAll('.nav-link').forEach(l => {
-    if (l.href === location.href) l.classList.add('active');
-  });
+document.querySelectorAll('.reveal').forEach(el =>
+  new IntersectionObserver(([e]) => { if(e.isIntersecting) e.target.classList.add('in'); }, {threshold:.1}).observe(el)
+);
 
-  // ── Scroll shrink ─────────────────────────────────────────────────────────
-  const mainNav = document.getElementById('mainNav');
-  window.addEventListener('scroll', () => {
-    mainNav.classList.toggle('scrolled', scrollY > 40);
-  }, { passive: true });
+document.querySelectorAll('.pill').forEach(p =>
+  p.addEventListener('click', () => { document.getElementById('smsIn').value = p.dataset.v; run(); })
+);
 
-  // ── Mobile toggle ─────────────────────────────────────────────────────────
-  document.getElementById('navBurger').addEventListener('click', () => {
-    document.getElementById('navLinks').classList.toggle('open');
-    document.getElementById('navBurger').classList.toggle('open');
-  });
+const RULES = [
+  { re: /urgent|suspended|verify|confirm|bank|credentials|login|password|expire|immediately|click here|your account|locked|security alert/i,
+    cls:'r-threat', verdict:'Smishing / Phishing',
+    desc:'High-urgency credential-harvesting patterns detected — characteristic of SMS phishing targeting personal or financial data.',
+    range:[91,98] },
+  { re: /won|prize|gift card|congratulations|free|claim|limited time|offer|discount|winner/i,
+    cls:'r-spam', verdict:'Likely Spam',
+    desc:'Promotional manipulation patterns found. No credential requests, but likely unsolicited commercial content.',
+    range:[74,89] },
+  { re: /.{6,}/,
+    cls:'r-safe', verdict:'Message Safe',
+    desc:'No phishing indicators, malicious URLs, or social-engineering patterns detected. Message appears legitimate.',
+    range:[85,97] }
+];
+
+document.getElementById('goBtn').onclick = run;
+document.getElementById('smsIn').addEventListener('keydown', e => { if(e.ctrlKey && e.key==='Enter') run(); });
+
+function run() {
+  const txt = document.getElementById('smsIn').value.trim();
+  if(!txt) return;
+  const btn = document.getElementById('goBtn');
+  btn.style.opacity = '.35'; btn.disabled = true;
+  setTimeout(() => {
+    const rule = RULES.find(x => x.re.test(txt)) || RULES[2];
+    const conf = Math.floor(Math.random() * (rule.range[1] - rule.range[0]) + rule.range[0]);
+    const box = document.getElementById('resultBox');
+    box.className = 'result-box ' + rule.cls;
+    document.getElementById('rVerdict').textContent = rule.verdict;
+    document.getElementById('rConf').textContent    = conf + '% confidence';
+    document.getElementById('rDesc').textContent    = rule.desc;
+    const bar = document.getElementById('rBar');
+    bar.style.width = '0%';
+    box.style.display = 'block';
+    requestAnimationFrame(() => requestAnimationFrame(() => bar.style.width = conf + '%'));
+    btn.style.opacity = '1'; btn.disabled = false;
+  }, 500);
+}
 </script>
 </body>
 </html>

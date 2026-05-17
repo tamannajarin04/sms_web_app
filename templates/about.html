@@ -1,77 +1,31 @@
 {% extends "base.html" %}
-{% block title %}About — SmishGuard AI{% endblock %}
+{% block title %}About - SmishGuard AI{% endblock %}
 
 {% block content %}
+<div class="container text-light">
+<h1>About SmishGuard AI</h1>
+<hr>
 
-<section class="inner-hero">
-  <p class="inner-tag">The Project</p>
-  <h1 class="inner-title">About SmishGuard AI</h1>
-  <p class="inner-body">An open, intelligent system built to protect users from SMS-based digital threats.</p>
-</section>
+<p>
+SmishGuard AI is an intelligent web-based system developed to detect spam,
+phishing and smishing SMS messages using machine learning techniques.
+The system aims to improve digital safety and fraud awareness.
+</p>
 
-<div class="inner-content">
+<h4>Key Features</h4>
+<ul>
+<li>AI-based SMS scanning</li>
+<li>Real-time classification</li>
+<li>User-friendly interface</li>
+<li>Scalable web architecture</li>
+</ul>
 
-  <!-- Mission -->
-  <div class="section-block">
-    <div class="glass-card-sm mission-card">
-      <p class="mission-text">
-        SmishGuard AI is a web-based threat detection platform that uses machine learning
-        to classify SMS messages as legitimate, spam, or smishing in real time.
-        Built to raise digital safety awareness, it is designed to be fast, transparent, and accessible to everyone.
-      </p>
-    </div>
-  </div>
-
-  <!-- Features -->
-  <div class="section-block">
-    <h2 class="section-title">Key Features</h2>
-    <div class="reason-grid">
-      <div class="glass-card-sm reason-card">
-        <h6>AI-Powered Scanning</h6>
-        <p>SVM + TF-IDF pipeline delivers accurate, production-grade SMS classification without a GPU.</p>
-      </div>
-      <div class="glass-card-sm reason-card">
-        <h6>Real-time Results</h6>
-        <p>Predictions returned in under 50 ms via a lightweight REST API — no page reloads required.</p>
-      </div>
-      <div class="glass-card-sm reason-card">
-        <h6>Accessible Interface</h6>
-        <p>Clean, keyboard-navigable UI designed for non-technical users and researchers alike.</p>
-      </div>
-      <div class="glass-card-sm reason-card">
-        <h6>Scalable Architecture</h6>
-        <p>Decoupled frontend and model API built for painless deployment, extension, and scaling.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Roadmap -->
-  <div class="section-block">
-    <h2 class="section-title">Roadmap</h2>
-    <div class="roadmap-stack">
-      <div class="glass-card-sm roadmap-item">
-        <span class="rm-badge rm-planned">Planned</span>
-        <div>
-          <h6>Explainable AI</h6>
-          <p>Surface the exact tokens that triggered a classification, giving users transparency into every decision.</p>
-        </div>
-      </div>
-      <div class="glass-card-sm roadmap-item">
-        <span class="rm-badge rm-planned">Planned</span>
-        <div>
-          <h6>URL Detection Engine</h6>
-          <p>Analyse embedded URLs against live phishing and malicious-domain databases for deeper threat intelligence.</p>
-        </div>
-      </div>
-      <div class="glass-card-sm roadmap-item">
-        <span class="rm-badge rm-future">Future</span>
-        <div>
-          <h6>Mobile Application</h6>
-          <p>Native iOS &amp; Android app with system-level SMS scanning and instant threat push notifications.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
+<h4>Future Scope</h4>
+<ul>
+<li>Explainable AI integration</li>
+<li>URL detection system</li>
+<li>Mobile application</li>
+</ul>
 </div>
 {% endblock %}
+
