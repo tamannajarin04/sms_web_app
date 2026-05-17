@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Model — SmishGuard AI{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <p class="page-tag">Technical Overview</p>
+    <h1 class="page-title">ML Model</h1>
+    <p class="page-subtitle">Architecture, algorithm, and pipeline powering real-time SMS classification.</p>
+  </div>
+</section>
+
+<div class="container page-content">
+
+  <!-- Core specs -->
+  <div class="info-grid">
+    <div class="info-card">
+      <span class="info-icon">⬡</span>
+      <span class="info-label">Algorithm</span>
+      <span class="info-value">Support Vector Machine</span>
+    </div>
+    <div class="info-card">
+      <span class="info-icon">◈</span>
+      <span class="info-label">Vectorization</span>
+      <span class="info-value">TF-IDF</span>
+    </div>
+    <div class="info-card">
+      <span class="info-icon">◉</span>
+      <span class="info-label">Task</span>
+      <span class="info-value">Binary Classification</span>
+    </div>
+    <div class="info-card">
+      <span class="info-icon">◫</span>
+      <span class="info-label">Output</span>
+      <span class="info-value">Spam / Legitimate</span>
+    </div>
+  </div>
+
+  <!-- Pipeline -->
+  <div class="section-block">
+    <h2 class="section-heading">System Pipeline</h2>
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <span class="step-num">01</span>
+        <div class="step-body">
+          <h5>Data Preprocessing</h5>
+          <p>Raw SMS text is cleaned — lowercased, stripped of noise, and stopwords removed — to produce a normalised input.</p>
+        </div>
+      </div>
+      <div class="pipeline-arrow" aria-hidden="true">↓</div>
+
+      <div class="pipeline-step">
+        <span class="step-num">02</span>
+        <div class="step-body">
+          <h5>TF-IDF Feature Extraction</h5>
+          <p>Term Frequency–Inverse Document Frequency converts processed text into high-dimensional numerical feature vectors.</p>
+        </div>
+      </div>
+      <div class="pipeline-arrow" aria-hidden="true">↓</div>
+
+      <div class="pipeline-step">
+        <span class="step-num">03</span>
+        <div class="step-body">
+          <h5>SVM Classification</h5>
+          <p>A trained Support Vector Machine finds the optimal hyperplane separating spam/smishing from legitimate messages.</p>
+        </div>
+      </div>
+      <div class="pipeline-arrow" aria-hidden="true">↓</div>
+
+      <div class="pipeline-step">
+        <span class="step-num">04</span>
+        <div class="step-body">
+          <h5>Real-time Prediction</h5>
+          <p>Results are returned via a REST API endpoint and rendered instantly in the interface.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Why SVM -->
+  <div class="section-block">
+    <h2 class="section-heading">Why SVM?</h2>
+    <div class="reason-grid">
+      <div class="reason-card">
+        <h6>High-Dimensional Performance</h6>
+        <p>SVM excels in sparse, high-dimensional feature spaces — exactly the environment TF-IDF produces from text data.</p>
+      </div>
+      <div class="reason-card">
+        <h6>Strong Generalisation</h6>
+        <p>Maximum-margin classification reduces overfitting, meaning the model generalises well to unseen SMS messages.</p>
+      </div>
+      <div class="reason-card">
+        <h6>Efficiency</h6>
+        <p>Lightweight inference means sub-50 ms predictions, supporting real-time applications without heavy infrastructure.</p>
+      </div>
+      <div class="reason-card">
+        <h6>Proven on Text Tasks</h6>
+        <p>SVM has a long track record in NLP benchmarks, particularly for spam and sentiment classification tasks.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

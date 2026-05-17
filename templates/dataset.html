@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Dataset — SmishGuard AI{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <p class="page-tag">Data Foundation</p>
+    <h1 class="page-title">Dataset</h1>
+    <p class="page-subtitle">The curated, preprocessed data that trains and validates the detection model.</p>
+  </div>
+</section>
+
+<div class="container page-content">
+
+  <!-- Overview cards -->
+  <div class="info-grid">
+    <div class="info-card">
+      <span class="info-icon">◈</span>
+      <span class="info-label">Dataset Type</span>
+      <span class="info-value">SMS Spam & Smishing</span>
+    </div>
+    <div class="info-card">
+      <span class="info-icon">⬡</span>
+      <span class="info-label">Classes</span>
+      <span class="info-value">Legitimate · Spam / Smishing</span>
+    </div>
+  </div>
+
+  <!-- Sources -->
+  <div class="section-block">
+    <h2 class="section-heading">Data Sources</h2>
+    <div class="source-list">
+      <div class="source-item">
+        <span class="source-tag">Public</span>
+        <div>
+          <h6>UCI SMS Spam Collection</h6>
+          <p>A widely-used benchmark dataset of 5,574 English SMS messages tagged as ham or spam, sourced from the UCI Machine Learning Repository.</p>
+        </div>
+      </div>
+      <div class="source-item">
+        <span class="source-tag">Custom</span>
+        <div>
+          <h6>Phishing & Smishing Samples</h6>
+          <p>Hand-curated examples of smishing attacks — fraudulent messages containing malicious URLs, fake prize alerts, and social engineering lures.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preprocessing pipeline -->
+  <div class="section-block">
+    <h2 class="section-heading">Preprocessing Pipeline</h2>
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <span class="step-num">01</span>
+        <div class="step-body">
+          <h5>Lowercasing</h5>
+          <p>All text normalised to lowercase to eliminate case-based variance (e.g. "WIN" = "win").</p>
+        </div>
+      </div>
+      <div class="pipeline-arrow" aria-hidden="true">↓</div>
+      <div class="pipeline-step">
+        <span class="step-num">02</span>
+        <div class="step-body">
+          <h5>Noise Removal</h5>
+          <p>Punctuation, special characters, and numeric tokens stripped unless semantically significant.</p>
+        </div>
+      </div>
+      <div class="pipeline-arrow" aria-hidden="true">↓</div>
+      <div class="pipeline-step">
+        <span class="step-num">03</span>
+        <div class="step-body">
+          <h5>Stopword Removal</h5>
+          <p>Common English stopwords (e.g. "the", "is") removed to reduce dimensionality and focus on discriminative terms.</p>
+        </div>
+      </div>
+      <div class="pipeline-arrow" aria-hidden="true">↓</div>
+      <div class="pipeline-step">
+        <span class="step-num">04</span>
+        <div class="step-body">
+          <h5>TF-IDF Vectorisation</h5>
+          <p>Cleaned tokens converted into numerical vectors that reflect both term frequency and corpus-wide rarity.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
