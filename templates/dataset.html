@@ -2,84 +2,89 @@
 {% block title %}Dataset — SmishGuard AI{% endblock %}
 
 {% block content %}
-<section class="page-hero">
-  <div class="container">
-    <p class="page-tag">Data Foundation</p>
-    <h1 class="page-title">Dataset</h1>
-    <p class="page-subtitle">The curated, preprocessed data that trains and validates the detection model.</p>
-  </div>
+
+<section class="inner-hero">
+  <p class="inner-tag">Data Foundation</p>
+  <h1 class="inner-title">Dataset</h1>
+  <p class="inner-body">The curated, preprocessed corpus that trains and validates the detection model.</p>
 </section>
 
-<div class="container page-content">
+<div class="inner-content">
 
-  <!-- Overview cards -->
-  <div class="info-grid">
-    <div class="info-card">
-      <span class="info-icon">◈</span>
-      <span class="info-label">Dataset Type</span>
-      <span class="info-value">SMS Spam & Smishing</span>
+  <!-- Overview chips -->
+  <div class="chip-row">
+    <div class="glass-chip">
+      <span class="chip-icon">◈</span>
+      <span class="chip-lbl">Type</span>
+      <strong>SMS Spam &amp; Smishing</strong>
     </div>
-    <div class="info-card">
-      <span class="info-icon">⬡</span>
-      <span class="info-label">Classes</span>
-      <span class="info-value">Legitimate · Spam / Smishing</span>
+    <div class="glass-chip">
+      <span class="chip-icon">⬡</span>
+      <span class="chip-lbl">Classes</span>
+      <strong>Legitimate · Spam / Smishing</strong>
     </div>
   </div>
 
   <!-- Sources -->
   <div class="section-block">
-    <h2 class="section-heading">Data Sources</h2>
-    <div class="source-list">
-      <div class="source-item">
-        <span class="source-tag">Public</span>
+    <h2 class="section-title">Data Sources</h2>
+    <div class="source-stack">
+      <div class="glass-card-sm source-item">
+        <span class="source-badge source-public">Public</span>
         <div>
           <h6>UCI SMS Spam Collection</h6>
-          <p>A widely-used benchmark dataset of 5,574 English SMS messages tagged as ham or spam, sourced from the UCI Machine Learning Repository.</p>
+          <p>5,574 English SMS messages tagged as ham or spam, sourced from the UCI Machine Learning Repository — a widely-used NLP benchmark.</p>
         </div>
       </div>
-      <div class="source-item">
-        <span class="source-tag">Custom</span>
+      <div class="glass-card-sm source-item">
+        <span class="source-badge source-custom">Custom</span>
         <div>
-          <h6>Phishing & Smishing Samples</h6>
-          <p>Hand-curated examples of smishing attacks — fraudulent messages containing malicious URLs, fake prize alerts, and social engineering lures.</p>
+          <h6>Phishing &amp; Smishing Samples</h6>
+          <p>Hand-curated smishing examples: fraudulent messages containing malicious URLs, fake prize alerts, and financial social-engineering lures.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Preprocessing pipeline -->
+  <!-- Preprocessing -->
   <div class="section-block">
-    <h2 class="section-heading">Preprocessing Pipeline</h2>
-    <div class="pipeline">
-      <div class="pipeline-step">
-        <span class="step-num">01</span>
-        <div class="step-body">
+    <h2 class="section-title">Preprocessing Pipeline</h2>
+    <div class="pipeline-list">
+      <div class="pipeline-node glass-card-sm">
+        <span class="node-num">01</span>
+        <div class="node-body">
           <h5>Lowercasing</h5>
-          <p>All text normalised to lowercase to eliminate case-based variance (e.g. "WIN" = "win").</p>
+          <p>All text normalised to lowercase to eliminate case-based variance (e.g. "WIN" ≡ "win").</p>
         </div>
       </div>
-      <div class="pipeline-arrow" aria-hidden="true">↓</div>
-      <div class="pipeline-step">
-        <span class="step-num">02</span>
-        <div class="step-body">
+      <div class="pipe-arrow" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      </div>
+      <div class="pipeline-node glass-card-sm">
+        <span class="node-num">02</span>
+        <div class="node-body">
           <h5>Noise Removal</h5>
-          <p>Punctuation, special characters, and numeric tokens stripped unless semantically significant.</p>
+          <p>Punctuation, special characters, and non-semantic numeric tokens stripped to reduce vocabulary noise.</p>
         </div>
       </div>
-      <div class="pipeline-arrow" aria-hidden="true">↓</div>
-      <div class="pipeline-step">
-        <span class="step-num">03</span>
-        <div class="step-body">
+      <div class="pipe-arrow" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      </div>
+      <div class="pipeline-node glass-card-sm">
+        <span class="node-num">03</span>
+        <div class="node-body">
           <h5>Stopword Removal</h5>
-          <p>Common English stopwords (e.g. "the", "is") removed to reduce dimensionality and focus on discriminative terms.</p>
+          <p>Common English stopwords (the, is, at…) removed to reduce dimensionality and focus on discriminative terms.</p>
         </div>
       </div>
-      <div class="pipeline-arrow" aria-hidden="true">↓</div>
-      <div class="pipeline-step">
-        <span class="step-num">04</span>
-        <div class="step-body">
+      <div class="pipe-arrow" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      </div>
+      <div class="pipeline-node glass-card-sm">
+        <span class="node-num">04</span>
+        <div class="node-body">
           <h5>TF-IDF Vectorisation</h5>
-          <p>Cleaned tokens converted into numerical vectors that reflect both term frequency and corpus-wide rarity.</p>
+          <p>Cleaned tokens converted into numerical vectors reflecting term frequency balanced by corpus-wide rarity.</p>
         </div>
       </div>
     </div>

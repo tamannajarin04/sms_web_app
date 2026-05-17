@@ -4,146 +4,162 @@
 {% block content %}
 
 <!-- Hero -->
-<section class="hero-section">
-  <div class="container">
-    <div class="row justify-content-center text-center">
-      <div class="col-lg-8">
-        <div class="hero-badge">
-          <span class="badge-dot"></span>
-          Real-time threat detection
-        </div>
-        <h1 class="hero-title">
-          Stop Smishing<br>
-          <span class="title-accent">Before It Strikes</span>
-        </h1>
-        <p class="hero-subtitle">
-          Machine learning–powered SMS analysis that identifies spam, phishing,
-          and smishing threats in milliseconds.
-        </p>
-      </div>
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <span class="live-dot" aria-hidden="true"></span>
+      Real-time threat analysis
     </div>
+
+    <h1 class="hero-title">
+      Detect Smishing<br>
+      <span class="gradient-text">Before It Hits</span>
+    </h1>
+
+    <p class="hero-body">
+      Paste any SMS and our SVM + TF-IDF engine classifies it as
+      legitimate, spam, or a smishing attack — instantly.
+    </p>
   </div>
 </section>
 
 <!-- Scanner -->
-<section class="scanner-section">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-lg-7">
+<section class="scanner-wrap">
+  <div class="glass-card scanner-card">
 
-        <div class="scan-card">
-          <div class="scan-card-header">
-            <div class="terminal-dots" aria-hidden="true">
-              <span></span><span></span><span></span>
-            </div>
-            <span class="scan-card-title">SMS Scanner</span>
-          </div>
+    <div class="card-chrome">
+      <div class="chrome-dots" aria-hidden="true">
+        <i></i><i></i><i></i>
+      </div>
+      <span class="chrome-label">sms_scanner.py</span>
+      <span class="chrome-badge">● live</span>
+    </div>
 
-          <div class="scan-card-body">
-            <label class="scan-label" for="sms">Paste your SMS message below</label>
-            <textarea
-              class="scan-textarea"
-              id="sms"
-              rows="5"
-              placeholder="e.g. Congratulations! You've won a prize. Click here to claim: http://..."
-              aria-label="SMS message input"
-            ></textarea>
+    <div class="card-body-inner">
+      <label class="field-label" for="sms">Input Message</label>
+      <div class="textarea-wrap">
+        <textarea
+          id="sms"
+          class="sms-input"
+          rows="5"
+          placeholder="Paste SMS here — e.g. 'Congratulations! Click to claim your prize…'"
+          aria-label="SMS message to analyse"
+          maxlength="1600"
+        ></textarea>
+        <span class="char-count" id="charCount">0 / 1600</span>
+      </div>
 
-            <button class="btn-scan" onclick="scanSMS()" id="scanBtn">
-              <span id="btnText">Analyse Message</span>
-              <span id="btnLoader" class="btn-loader" hidden></span>
-            </button>
+      <button class="btn-analyse" id="scanBtn" onclick="scanSMS()">
+        <span id="btnLabel">Analyse Message</span>
+        <svg id="btnArrow" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
+          <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+        </svg>
+        <svg id="btnSpinner" class="spinner" viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true" hidden>
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="56" stroke-dashoffset="14"/>
+        </svg>
+      </button>
 
-            <div id="resultBox" class="result-box" role="alert" aria-live="polite" hidden></div>
-          </div>
+      <!-- Result -->
+      <div id="resultBox" class="result-box" role="alert" aria-live="polite" hidden>
+        <div class="result-icon-wrap" id="resultIcon"></div>
+        <div class="result-text">
+          <span class="result-verdict" id="resultVerdict"></span>
+          <span class="result-sub" id="resultSub"></span>
         </div>
-
       </div>
     </div>
   </div>
 </section>
 
-<!-- Stats row -->
-<section class="stats-section">
-  <div class="container">
-    <div class="stats-row">
-      <div class="stat-item">
-        <span class="stat-number">99.2<span class="stat-unit">%</span></span>
-        <span class="stat-label">Detection Accuracy</span>
-      </div>
-      <div class="stat-divider" aria-hidden="true"></div>
-      <div class="stat-item">
-        <span class="stat-number">&lt;50<span class="stat-unit">ms</span></span>
-        <span class="stat-label">Prediction Latency</span>
-      </div>
-      <div class="stat-divider" aria-hidden="true"></div>
-      <div class="stat-item">
-        <span class="stat-number">3<span class="stat-unit">+</span></span>
-        <span class="stat-label">Threat Classes</span>
-      </div>
-      <div class="stat-divider" aria-hidden="true"></div>
-      <div class="stat-item">
-        <span class="stat-number">SVM</span>
-        <span class="stat-label">Core Algorithm</span>
-      </div>
+<!-- Stats -->
+<section class="stats-strip">
+  <div class="stats-glass">
+    <div class="stat">
+      <span class="stat-val">99.2<sup>%</sup></span>
+      <span class="stat-lbl">Accuracy</span>
+    </div>
+    <div class="stat-rule" aria-hidden="true"></div>
+    <div class="stat">
+      <span class="stat-val">&lt;50<sup>ms</sup></span>
+      <span class="stat-lbl">Latency</span>
+    </div>
+    <div class="stat-rule" aria-hidden="true"></div>
+    <div class="stat">
+      <span class="stat-val">3<sup>+</sup></span>
+      <span class="stat-lbl">Threat Classes</span>
+    </div>
+    <div class="stat-rule" aria-hidden="true"></div>
+    <div class="stat">
+      <span class="stat-val">SVM</span>
+      <span class="stat-lbl">Algorithm</span>
     </div>
   </div>
 </section>
 
 <script>
+const textarea  = document.getElementById('sms');
+const charCount = document.getElementById('charCount');
+
+textarea.addEventListener('input', () => {
+  const len = textarea.value.length;
+  charCount.textContent = `${len} / 1600`;
+  charCount.classList.toggle('warn', len > 1400);
+});
+
 async function scanSMS() {
-  const sms = document.getElementById("sms").value.trim();
-  if (!sms) {
-    showToast("Please enter a message to scan.");
-    return;
-  }
+  const sms = textarea.value.trim();
+  if (!sms) { pulse(textarea); return; }
 
-  const btn = document.getElementById("scanBtn");
-  const btnText = document.getElementById("btnText");
-  const btnLoader = document.getElementById("btnLoader");
-  const resultBox = document.getElementById("resultBox");
+  const btn      = document.getElementById('scanBtn');
+  const label    = document.getElementById('btnLabel');
+  const arrow    = document.getElementById('btnArrow');
+  const spinner  = document.getElementById('btnSpinner');
+  const resultBox = document.getElementById('resultBox');
 
-  btn.disabled = true;
-  btnText.textContent = "Analysing…";
-  btnLoader.hidden = false;
+  btn.disabled   = true;
+  label.textContent = 'Analysing…';
+  arrow.hidden   = true;
+  spinner.hidden = false;
   resultBox.hidden = true;
 
   try {
-    const response = await fetch("/predict", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const res  = await fetch('/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sms })
     });
-    const data = await response.json();
+    const data = await res.json();
 
-    const isLegit = data.label === "legitimate" || data.label === "ham";
-    resultBox.className = "result-box " + (isLegit ? "result-safe" : "result-threat");
+    if (!res.ok) throw new Error(data.error || 'Server error');
 
-    resultBox.innerHTML = `
-      <div class="result-icon">${isLegit ? "✓" : "⚠"}</div>
-      <div class="result-content">
-        <span class="result-verdict">${isLegit ? "Legitimate Message" : "Threat Detected"}</span>
-        <span class="result-detail">${data.prediction}</span>
-      </div>
-    `;
+    const safe = data.label === 'safe';
+    resultBox.className = 'result-box ' + (safe ? 'result-safe' : 'result-threat');
+    document.getElementById('resultIcon').innerHTML = safe
+      ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+      : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+    document.getElementById('resultVerdict').textContent = safe ? 'Legitimate Message' : 'Threat Detected';
+    document.getElementById('resultSub').textContent = data.prediction;
     resultBox.hidden = false;
+
   } catch (err) {
-    resultBox.className = "result-box result-error";
-    resultBox.innerHTML = `<div class="result-icon">!</div><div class="result-content"><span class="result-verdict">Error</span><span class="result-detail">Could not reach the server. Please try again.</span></div>`;
+    resultBox.className = 'result-box result-error';
+    document.getElementById('resultIcon').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+    document.getElementById('resultVerdict').textContent = 'Request Failed';
+    document.getElementById('resultSub').textContent = err.message;
     resultBox.hidden = false;
   } finally {
     btn.disabled = false;
-    btnText.textContent = "Analyse Message";
-    btnLoader.hidden = true;
+    label.textContent = 'Analyse Message';
+    arrow.hidden  = false;
+    spinner.hidden = true;
   }
 }
 
-function showToast(msg) {
-  const t = document.createElement("div");
-  t.className = "toast-msg";
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
+function pulse(el) {
+  el.classList.remove('shake');
+  void el.offsetWidth;
+  el.classList.add('shake');
+  el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
 }
 </script>
 {% endblock %}
