@@ -1,94 +1,631 @@
-{% extends "base.html" %}
-{% block title %}Dataset — SmishGuard AI{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmishGuard — Dataset</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:           #f7f8fc;
+      --surface:      #ffffff;
+      --surface-2:    #f0f2f8;
+      --border:       #e2e6f0;
+      --border-dark:  #c8cfdf;
+      --accent:       #2563eb;
+      --accent-dim:   #3b82f6;
+      --accent-bg:    #eff5ff;
+      --danger:       #dc2626;
+      --danger-bg:    #fef2f2;
+      --danger-border:#fecaca;
+      --safe:         #16a34a;
+      --safe-bg:      #f0fdf4;
+      --safe-border:  #bbf7d0;
+      --warn:         #d97706;
+      --text:         #0f172a;
+      --text-2:       #334155;
+      --text-muted:   #64748b;
+      --text-faint:   #94a3b8;
+      --mono:         'DM Mono', monospace;
+      --sans:         'Sora', sans-serif;
+      --shadow-sm:    0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04);
+      --shadow:       0 4px 16px rgba(15,23,42,.08), 0 1px 4px rgba(15,23,42,.04);
+      --shadow-lg:    0 12px 40px rgba(15,23,42,.1), 0 2px 8px rgba(15,23,42,.05);
+    }
 
-{% block content %}
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<section class="inner-hero">
-  <p class="inner-tag">Data Foundation</p>
-  <h1 class="inner-title">Dataset</h1>
-  <p class="inner-body">The curated, preprocessed corpus that trains and validates the detection model.</p>
-</section>
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-<div class="inner-content">
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image: radial-gradient(circle, #d1d5e8 1px, transparent 1px);
+      background-size: 28px 28px;
+      opacity: .45;
+      pointer-events: none;
+    }
 
-  <!-- Overview chips -->
-  <div class="chip-row">
-    <div class="glass-chip">
-      <span class="chip-icon">◈</span>
-      <span class="chip-lbl">Type</span>
-      <strong>SMS Spam &amp; Smishing</strong>
+    /* ── Navbar ── */
+    .navbar {
+      background: rgba(255,255,255,.88);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 0 2.5rem;
+      height: 64px;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .navbar-brand {
+      font-family: var(--sans);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text) !important;
+      display: flex; align-items: center; gap: .65rem;
+      letter-spacing: -.02em;
+    }
+    .brand-logo {
+      width: 34px; height: 34px;
+      background: var(--accent);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: .9rem;
+      box-shadow: 0 2px 8px rgba(37,99,235,.35);
+    }
+    .brand-tag {
+      font-size: .62rem;
+      font-weight: 500;
+      font-family: var(--mono);
+      color: var(--accent);
+      background: var(--accent-bg);
+      border: 1px solid #bfdbfe;
+      border-radius: 4px;
+      padding: .1rem .4rem;
+      letter-spacing: .04em;
+      margin-left: .1rem;
+      align-self: center;
+    }
+    .nav-link {
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--text-muted) !important;
+      padding: .4rem .85rem !important;
+      border-radius: 7px;
+      transition: color .18s, background .18s;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: var(--accent) !important;
+      background: var(--accent-bg);
+    }
+
+    /* ── Page header ── */
+    .page-header {
+      position: relative; z-index: 1;
+      padding: 4.5rem 1.5rem 2.5rem;
+      text-align: center;
+    }
+    .page-tag {
+      display: inline-flex; align-items: center; gap: .45rem;
+      font-family: var(--mono);
+      font-size: .7rem;
+      color: var(--accent);
+      background: var(--accent-bg);
+      border: 1px solid #bfdbfe;
+      border-radius: 100px;
+      padding: .3rem 1rem;
+      margin-bottom: 1.4rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .page-header h1 {
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -.04em;
+      line-height: 1.12;
+      margin-bottom: .9rem;
+    }
+    .page-header h1 em {
+      font-style: normal;
+      color: var(--accent);
+      position: relative;
+    }
+    .page-header h1 em::after {
+      content: '';
+      position: absolute;
+      bottom: 2px; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), #60a5fa);
+      border-radius: 4px;
+      opacity: .35;
+    }
+    .page-header p {
+      color: var(--text-muted);
+      font-size: .98rem;
+      line-height: 1.7;
+    }
+
+    /* ── Content wrap ── */
+    .content-wrap {
+      position: relative; z-index: 1;
+      max-width: 900px;
+      margin: 0 auto 5rem;
+      padding: 0 1.5rem;
+    }
+
+    /* ── Card block ── */
+    .card-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem 2.2rem;
+      margin-bottom: 1.2rem;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .block-title {
+      display: flex; align-items: center; gap: .6rem;
+      font-size: .72rem;
+      font-weight: 600;
+      font-family: var(--mono);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: 1.4rem;
+    }
+    .block-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .block-title i { font-size: .65rem; }
+
+    /* ── Overview stats ── */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: .75rem;
+    }
+    .ov-cell {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem 1rem;
+      text-align: center;
+      transition: border-color .2s, box-shadow .2s, transform .2s;
+    }
+    .ov-cell:hover {
+      border-color: var(--accent-dim);
+      box-shadow: 0 4px 14px rgba(37,99,235,.1);
+      transform: translateY(-2px);
+    }
+    .ov-val {
+      font-family: var(--mono);
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: -.02em;
+    }
+    .ov-lbl {
+      font-size: .67rem;
+      font-weight: 600;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-top: .3rem;
+    }
+
+    /* ── Label distribution ── */
+    .label-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: .8rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .label-row:last-child { border-bottom: none; }
+    .label-name {
+      font-family: var(--mono);
+      font-size: .78rem;
+      font-weight: 500;
+      width: 82px;
+      flex-shrink: 0;
+    }
+    .label-bar-wrap {
+      flex: 1;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      height: 10px;
+      overflow: hidden;
+    }
+    .label-bar {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 1s cubic-bezier(.22,.61,.36,1);
+    }
+    .label-count {
+      font-family: var(--mono);
+      font-size: .76rem;
+      width: 60px;
+      text-align: right;
+      color: var(--text-muted);
+    }
+    .label-pct {
+      font-family: var(--mono);
+      font-size: .72rem;
+      width: 44px;
+      text-align: right;
+      font-weight: 500;
+    }
+
+    /* ── Sample messages ── */
+    .sample-grid { display: grid; gap: .7rem; }
+    .sample-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+      display: flex;
+      gap: .9rem;
+      align-items: flex-start;
+      transition: border-color .18s;
+    }
+    .sample-card:hover { border-color: var(--border-dark); }
+    .sample-tag {
+      font-family: var(--mono);
+      font-size: .62rem;
+      font-weight: 500;
+      border-radius: 5px;
+      padding: .2rem .55rem;
+      flex-shrink: 0;
+      margin-top: .1rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .sample-tag.ham {
+      background: var(--safe-bg);
+      color: var(--safe);
+      border: 1px solid var(--safe-border);
+    }
+    .sample-tag.threat {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid var(--danger-border);
+    }
+    .sample-text {
+      font-size: .84rem;
+      color: var(--text-2);
+      line-height: 1.65;
+    }
+
+    /* ── Dataset columns table ── */
+    .data-table {
+      width: 100%;
+      font-size: .83rem;
+      border-collapse: collapse;
+    }
+    .data-table thead tr {
+      border-bottom: 2px solid var(--border);
+    }
+    .data-table th {
+      font-family: var(--mono);
+      font-size: .68rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      padding: .6rem 1rem;
+      text-align: left;
+    }
+    .data-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background .15s;
+    }
+    .data-table tbody tr:last-child { border-bottom: none; }
+    .data-table tbody tr:hover { background: var(--surface-2); }
+    .data-table td {
+      padding: .7rem 1rem;
+      color: var(--text-muted);
+      vertical-align: middle;
+    }
+    .col-name {
+      font-family: var(--mono);
+      font-size: .8rem;
+      font-weight: 500;
+    }
+    .col-name.used   { color: var(--safe); }
+    .col-name.unused { color: var(--text-faint); }
+    .col-type {
+      font-family: var(--mono);
+      font-size: .75rem;
+      color: var(--text-faint);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: .15rem .45rem;
+      display: inline-block;
+    }
+    .used-badge {
+      display: inline-flex; align-items: center; gap: .35rem;
+      font-size: .72rem;
+      font-weight: 500;
+      border-radius: 5px;
+      padding: .2rem .55rem;
+    }
+    .used-badge.yes {
+      background: var(--safe-bg);
+      color: var(--safe);
+      border: 1px solid var(--safe-border);
+    }
+    .used-badge.no {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid var(--danger-border);
+    }
+
+    /* ── Preprocessing list ── */
+    .prep-list { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
+    .prep-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: .9rem;
+      font-size: .85rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      padding: .75rem 1rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      transition: border-color .18s;
+    }
+    .prep-list li:hover { border-color: var(--border-dark); }
+    .step-num {
+      width: 24px; height: 24px;
+      background: var(--accent-bg);
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono);
+      font-size: .68rem;
+      font-weight: 500;
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: .05rem;
+    }
+    code {
+      font-family: var(--mono);
+      font-size: .78rem;
+      color: var(--accent);
+      background: var(--accent-bg);
+      border: 1px solid #bfdbfe;
+      border-radius: 4px;
+      padding: .1rem .4rem;
+    }
+
+    /* ── Footer ── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2.5rem;
+      font-size: .75rem;
+      font-weight: 500;
+      color: var(--text-faint);
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: .5rem;
+      background: var(--surface);
+    }
+    .footer-links { display: flex; gap: 1.5rem; }
+    footer a { color: var(--text-muted); text-decoration: none; transition: color .15s; }
+    footer a:hover { color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .navbar { padding: 0 1.2rem; }
+      .card-block { padding: 1.5rem 1.2rem; }
+      .page-header { padding: 3rem 1rem 2rem; }
+      .label-name { width: 68px; }
+      .label-count { display: none; }
+      footer { padding: 1.2rem; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">
+      <div class="brand-logo"><i class="fa fa-shield-halved"></i></div>
+      SmishGuard
+      <span class="brand-tag">v2.0</span>
+    </a>
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <i class="fa fa-bars" style="color:var(--text-muted)"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto gap-1 align-items-center">
+        <li class="nav-item"><a class="nav-link" href="/">Detect</a></li>
+        <li class="nav-item"><a class="nav-link" href="/model">Model</a></li>
+        <li class="nav-item"><a class="nav-link active" href="/dataset">Dataset</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+      </ul>
     </div>
-    <div class="glass-chip">
-      <span class="chip-icon">⬡</span>
-      <span class="chip-lbl">Classes</span>
-      <strong>Legitimate · Spam / Smishing</strong>
+  </div>
+</nav>
+
+<!-- ── Page header ── -->
+<div class="page-header">
+  <div class="page-tag"><i class="fa fa-database" style="font-size:.6rem"></i> Training Data</div>
+  <h1>The <em>Dataset</em></h1>
+  <p>Dataset_5971.csv — 5,971 labeled SMS messages used to train and evaluate the model.</p>
+</div>
+
+<!-- ── Content ── -->
+<div class="content-wrap">
+
+  <!-- Overview -->
+  <div class="card-block">
+    <div class="block-title"><i class="fa fa-database"></i> Dataset Overview</div>
+    <div class="overview-grid">
+      <div class="ov-cell"><div class="ov-val">5,971</div><div class="ov-lbl">Total Messages</div></div>
+      <div class="ov-cell"><div class="ov-val">4,844</div><div class="ov-lbl">Legitimate (Ham)</div></div>
+      <div class="ov-cell"><div class="ov-val">1,127</div><div class="ov-lbl">Threat (Spam/Smishing)</div></div>
+      <div class="ov-cell"><div class="ov-val">5</div><div class="ov-lbl">Original Labels</div></div>
+      <div class="ov-cell"><div class="ov-val">2</div><div class="ov-lbl">Final Classes</div></div>
     </div>
   </div>
 
-  <!-- Sources -->
-  <div class="section-block">
-    <h2 class="section-title">Data Sources</h2>
-    <div class="source-stack">
-      <div class="glass-card-sm source-item">
-        <span class="source-badge source-public">Public</span>
-        <div>
-          <h6>UCI SMS Spam Collection</h6>
-          <p>5,574 English SMS messages tagged as ham or spam, sourced from the UCI Machine Learning Repository — a widely-used NLP benchmark.</p>
-        </div>
+  <!-- Label distribution -->
+  <div class="card-block">
+    <div class="block-title"><i class="fa fa-chart-pie"></i> Label Distribution</div>
+    <div id="labelChart"></div>
+  </div>
+
+  <!-- Sample messages -->
+  <div class="card-block">
+    <div class="block-title"><i class="fa fa-comment-dots"></i> Sample Messages</div>
+    <div class="sample-grid">
+      <div class="sample-card">
+        <span class="sample-tag ham">Ham</span>
+        <div class="sample-text">Your opinion about me? 1. Over 2. Jada 3. Kusr ... reply with the number</div>
       </div>
-      <div class="glass-card-sm source-item">
-        <span class="source-badge source-custom">Custom</span>
-        <div>
-          <h6>Phishing &amp; Smishing Samples</h6>
-          <p>Hand-curated smishing examples: fraudulent messages containing malicious URLs, fake prize alerts, and financial social-engineering lures.</p>
-        </div>
+      <div class="sample-card">
+        <span class="sample-tag ham">Ham</span>
+        <div class="sample-text">What's up? Do you want me to come online? If yes, bring the book.</div>
       </div>
+      <div class="sample-card">
+        <span class="sample-tag threat">Smishing</span>
+        <div class="sample-text">Please Stay At Home. To encourage the notion of staying home, we are giving away £150 Amazon vouchers...</div>
+      </div>
+      <div class="sample-card">
+        <span class="sample-tag threat">Spam</span>
+        <div class="sample-text">Ur cash-balance is currently 500 pounds - to maximize ur cash-in now send CASH to 86688 only 150p/msg. CC: 08718720201</div>
+      </div>
+      <div class="sample-card">
+        <span class="sample-tag threat">Smishing</span>
+        <div class="sample-text">4mths half price Orange line rental &amp; latest camera phones 4 FREE. Had your phone 11mths+? Call MobilesDirect free on 08000938768 to update now!</div>
+      </div>
+      <div class="sample-card">
+        <span class="sample-tag ham">Ham</span>
+        <div class="sample-text">Also sir, I sent you an email about how to log in to the portal. Please check whenever convenient.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dataset columns -->
+  <div class="card-block">
+    <div class="block-title"><i class="fa fa-table-columns"></i> Dataset Columns</div>
+    <div style="overflow-x:auto">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Column</th>
+            <th>Type</th>
+            <th>Used</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="col-name used">LABEL</span></td>
+            <td><span class="col-type">category</span></td>
+            <td><span class="used-badge yes"><i class="fa fa-check"></i> Yes</span></td>
+            <td>Original label: ham, spam, Spam, Smishing, smishing</td>
+          </tr>
+          <tr>
+            <td><span class="col-name used">TEXT</span></td>
+            <td><span class="col-type">string</span></td>
+            <td><span class="used-badge yes"><i class="fa fa-check"></i> Yes</span></td>
+            <td>The raw SMS message content — primary feature</td>
+          </tr>
+          <tr>
+            <td><span class="col-name unused">URL</span></td>
+            <td><span class="col-type">binary</span></td>
+            <td><span class="used-badge no"><i class="fa fa-xmark"></i> Dropped</span></td>
+            <td>Whether a URL is present (yes/No)</td>
+          </tr>
+          <tr>
+            <td><span class="col-name unused">EMAIL</span></td>
+            <td><span class="col-type">binary</span></td>
+            <td><span class="used-badge no"><i class="fa fa-xmark"></i> Dropped</span></td>
+            <td>Whether an email address is present</td>
+          </tr>
+          <tr>
+            <td><span class="col-name unused">PHONE</span></td>
+            <td><span class="col-type">binary</span></td>
+            <td><span class="used-badge no"><i class="fa fa-xmark"></i> Dropped</span></td>
+            <td>Whether a phone number is present</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
   <!-- Preprocessing -->
-  <div class="section-block">
-    <h2 class="section-title">Preprocessing Pipeline</h2>
-    <div class="pipeline-list">
-      <div class="pipeline-node glass-card-sm">
-        <span class="node-num">01</span>
-        <div class="node-body">
-          <h5>Lowercasing</h5>
-          <p>All text normalised to lowercase to eliminate case-based variance (e.g. "WIN" ≡ "win").</p>
-        </div>
-      </div>
-      <div class="pipe-arrow" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-      </div>
-      <div class="pipeline-node glass-card-sm">
-        <span class="node-num">02</span>
-        <div class="node-body">
-          <h5>Noise Removal</h5>
-          <p>Punctuation, special characters, and non-semantic numeric tokens stripped to reduce vocabulary noise.</p>
-        </div>
-      </div>
-      <div class="pipe-arrow" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-      </div>
-      <div class="pipeline-node glass-card-sm">
-        <span class="node-num">03</span>
-        <div class="node-body">
-          <h5>Stopword Removal</h5>
-          <p>Common English stopwords (the, is, at…) removed to reduce dimensionality and focus on discriminative terms.</p>
-        </div>
-      </div>
-      <div class="pipe-arrow" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-      </div>
-      <div class="pipeline-node glass-card-sm">
-        <span class="node-num">04</span>
-        <div class="node-body">
-          <h5>TF-IDF Vectorisation</h5>
-          <p>Cleaned tokens converted into numerical vectors reflecting term frequency balanced by corpus-wide rarity.</p>
-        </div>
-      </div>
-    </div>
+  <div class="card-block">
+    <div class="block-title"><i class="fa fa-gears"></i> Preprocessing Steps</div>
+    <ul class="prep-list">
+      <li><span class="step-num">1</span> Normalize label casing: <code>str.lower().str.strip()</code> so "Smishing", "smishing" → "smishing"</li>
+      <li><span class="step-num">2</span> Map labels to binary target: ham → 0, spam/smishing → 1</li>
+      <li><span class="step-num">3</span> Drop rows where target is NaN (unknown label variants)</li>
+      <li><span class="step-num">4</span> Drop URL, EMAIL, PHONE columns — text alone suffices for high accuracy</li>
+      <li><span class="step-num">5</span> 80/20 stratified train-test split to preserve class ratio</li>
+      <li><span class="step-num">6</span> Fit TF-IDF vectorizer on training set; transform both splits</li>
+    </ul>
   </div>
 
 </div>
-{% endblock %}
+
+<!-- ── Footer ── -->
+<footer>
+  <span>© 2025 SmishGuard — NLP-Based Smishing Detection System</span>
+  <div class="footer-links">
+    <a href="/">Detector</a>
+    <a href="/model">Model</a>
+    <a href="/about">About</a>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Label distribution chart — logic unchanged from original
+  const labels = [
+    { name: 'ham',      count: 4844, pct: 81.1, color: '#16a34a' },
+    { name: 'Smishing', count:  616, pct: 10.3, color: '#dc2626' },
+    { name: 'spam',     count:  466, pct:  7.8, color: '#ea580c' },
+    { name: 'Spam',     count:   23, pct:  0.4, color: '#ea580c' },
+    { name: 'smishing', count:   22, pct:  0.4, color: '#dc2626' },
+  ];
+
+  const chart = document.getElementById('labelChart');
+  labels.forEach(l => {
+    const row = document.createElement('div');
+    row.className = 'label-row';
+    row.innerHTML = `
+      <div class="label-name" style="color:${l.color}">${l.name}</div>
+      <div class="label-bar-wrap">
+        <div class="label-bar" style="background:${l.color};opacity:.75;width:0" data-w="${l.pct}%"></div>
+      </div>
+      <div class="label-count">${l.count.toLocaleString()}</div>
+      <div class="label-pct" style="color:${l.color}">${l.pct}%</div>
+    `;
+    chart.appendChild(row);
+  });
+
+  setTimeout(() => {
+    document.querySelectorAll('.label-bar').forEach(b => { b.style.width = b.dataset.w; });
+  }, 200);
+</script>
+</body>
+</html>

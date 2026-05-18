@@ -1,106 +1,631 @@
-{% extends "base.html" %}
-{% block title %}Model — SmishGuard AI{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmishGuard — Model</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:           #f7f8fc;
+      --surface:      #ffffff;
+      --surface-2:    #f0f2f8;
+      --border:       #e2e6f0;
+      --border-dark:  #c8cfdf;
+      --accent:       #2563eb;
+      --accent-dim:   #3b82f6;
+      --accent-bg:    #eff5ff;
+      --danger:       #dc2626;
+      --safe:         #16a34a;
+      --safe-bg:      #f0fdf4;
+      --safe-border:  #bbf7d0;
+      --text:         #0f172a;
+      --text-2:       #334155;
+      --text-muted:   #64748b;
+      --text-faint:   #94a3b8;
+      --mono:         'DM Mono', monospace;
+      --sans:         'Sora', sans-serif;
+      --shadow-sm:    0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04);
+      --shadow:       0 4px 16px rgba(15,23,42,.08), 0 1px 4px rgba(15,23,42,.04);
+      --shadow-lg:    0 12px 40px rgba(15,23,42,.1), 0 2px 8px rgba(15,23,42,.05);
+    }
 
-{% block content %}
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<section class="inner-hero">
-  <p class="inner-tag">Technical Architecture</p>
-  <h1 class="inner-title">ML Model</h1>
-  <p class="inner-body">The algorithm, vectorisation strategy, and inference pipeline behind SmishGuard.</p>
-</section>
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-<div class="inner-content">
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image: radial-gradient(circle, #d1d5e8 1px, transparent 1px);
+      background-size: 28px 28px;
+      opacity: .45;
+      pointer-events: none;
+    }
 
-  <!-- Spec chips -->
-  <div class="chip-row">
-    <div class="glass-chip">
-      <span class="chip-icon">⬡</span>
-      <span class="chip-lbl">Algorithm</span>
-      <strong>Support Vector Machine</strong>
-    </div>
-    <div class="glass-chip">
-      <span class="chip-icon">◈</span>
-      <span class="chip-lbl">Vectorisation</span>
-      <strong>TF-IDF</strong>
-    </div>
-    <div class="glass-chip">
-      <span class="chip-icon">◉</span>
-      <span class="chip-lbl">Task</span>
-      <strong>Binary Classification</strong>
-    </div>
-    <div class="glass-chip">
-      <span class="chip-icon">◫</span>
-      <span class="chip-lbl">Output</span>
-      <strong>Spam · Legitimate</strong>
+    /* ── Navbar ── */
+    .navbar {
+      background: rgba(255,255,255,.88);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 0 2.5rem;
+      height: 64px;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .navbar-brand {
+      font-family: var(--sans);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text) !important;
+      display: flex; align-items: center; gap: .65rem;
+      letter-spacing: -.02em;
+    }
+    .brand-logo {
+      width: 34px; height: 34px;
+      background: var(--accent);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: .9rem;
+      box-shadow: 0 2px 8px rgba(37,99,235,.35);
+    }
+    .brand-tag {
+      font-size: .62rem;
+      font-weight: 500;
+      font-family: var(--mono);
+      color: var(--accent);
+      background: var(--accent-bg);
+      border: 1px solid #bfdbfe;
+      border-radius: 4px;
+      padding: .1rem .4rem;
+      letter-spacing: .04em;
+      margin-left: .1rem;
+      align-self: center;
+    }
+    .nav-link {
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--text-muted) !important;
+      padding: .4rem .85rem !important;
+      border-radius: 7px;
+      transition: color .18s, background .18s;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: var(--accent) !important;
+      background: var(--accent-bg);
+    }
+
+    /* ── Page header ── */
+    .page-header {
+      position: relative; z-index: 1;
+      padding: 4.5rem 1.5rem 2.5rem;
+      text-align: center;
+    }
+    .page-tag {
+      display: inline-flex; align-items: center; gap: .45rem;
+      font-family: var(--mono);
+      font-size: .7rem;
+      color: var(--accent);
+      background: var(--accent-bg);
+      border: 1px solid #bfdbfe;
+      border-radius: 100px;
+      padding: .3rem 1rem;
+      margin-bottom: 1.4rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .page-header h1 {
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -.04em;
+      line-height: 1.12;
+      margin-bottom: .9rem;
+    }
+    .page-header h1 em {
+      font-style: normal;
+      color: var(--accent);
+      position: relative;
+    }
+    .page-header h1 em::after {
+      content: '';
+      position: absolute;
+      bottom: 2px; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), #60a5fa);
+      border-radius: 4px;
+      opacity: .35;
+    }
+    .page-header p {
+      color: var(--text-muted);
+      font-size: .98rem;
+      line-height: 1.7;
+    }
+
+    /* ── Content wrap ── */
+    .content-wrap {
+      position: relative; z-index: 1;
+      max-width: 900px;
+      margin: 0 auto 5rem;
+      padding: 0 1.5rem;
+    }
+
+    /* ── Card block ── */
+    .card-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem 2.2rem;
+      margin-bottom: 1.2rem;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .block-title {
+      display: flex; align-items: center; gap: .6rem;
+      font-size: .72rem;
+      font-weight: 600;
+      font-family: var(--mono);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: 1.4rem;
+    }
+    .block-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .block-title i { font-size: .65rem; }
+
+    /* ── Pipeline ── */
+    .pipeline {
+      display: flex;
+      gap: 0;
+      flex-wrap: wrap;
+    }
+    .pipe-step {
+      flex: 1;
+      min-width: 130px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 1.2rem .9rem;
+      text-align: center;
+      position: relative;
+      transition: border-color .2s, background .2s;
+    }
+    .pipe-step:hover {
+      background: var(--accent-bg);
+      border-color: #bfdbfe;
+    }
+    .pipe-step:not(:last-child)::after {
+      content: '→';
+      position: absolute;
+      right: -13px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--accent-dim);
+      font-family: var(--mono);
+      z-index: 2;
+      font-size: .9rem;
+      background: var(--surface);
+      padding: 0 2px;
+    }
+    .pipe-step:first-child  { border-radius: 10px 0 0 10px; }
+    .pipe-step:last-child   { border-radius: 0 10px 10px 0; }
+    .pipe-icon {
+      font-size: 1.25rem;
+      margin-bottom: .55rem;
+      color: var(--accent);
+    }
+    .pipe-name {
+      font-family: var(--mono);
+      font-size: .72rem;
+      color: var(--text);
+      font-weight: 500;
+      margin-bottom: .25rem;
+    }
+    .pipe-desc {
+      font-size: .65rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* ── Metrics grid ── */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: .75rem;
+    }
+    .metric-cell {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.3rem 1rem;
+      text-align: center;
+      transition: border-color .2s, box-shadow .2s, transform .2s;
+    }
+    .metric-cell:hover {
+      border-color: var(--accent-dim);
+      box-shadow: 0 4px 14px rgba(37,99,235,.1);
+      transform: translateY(-2px);
+    }
+    .metric-val {
+      font-family: var(--mono);
+      font-size: 1.6rem;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: -.02em;
+    }
+    .metric-lbl {
+      font-size: .68rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-top: .3rem;
+    }
+    .metric-sub {
+      font-size: .62rem;
+      color: var(--text-faint);
+      margin-top: .15rem;
+    }
+
+    /* ── Model comparison ── */
+    .comparison-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: .85rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .comparison-row:last-child { border-bottom: none; }
+    .model-name {
+      font-family: var(--mono);
+      font-size: .78rem;
+      color: var(--text-muted);
+      width: 190px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .model-name.winner { color: var(--accent); font-weight: 500; }
+    .bar-wrap {
+      flex: 1;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      height: 9px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      background: var(--border-dark);
+      transition: width 1s cubic-bezier(.22,.61,.36,1);
+    }
+    .bar-fill.winner {
+      background: linear-gradient(90deg, var(--accent-dim), var(--accent));
+    }
+    .acc-val {
+      font-family: var(--mono);
+      font-size: .78rem;
+      width: 52px;
+      text-align: right;
+      color: var(--text-faint);
+    }
+    .acc-val.winner { color: var(--accent); font-weight: 500; }
+    .badge-winner {
+      font-family: var(--mono);
+      font-size: .58rem;
+      background: var(--accent-bg);
+      color: var(--accent);
+      border: 1px solid #bfdbfe;
+      border-radius: 4px;
+      padding: .12rem .4rem;
+      letter-spacing: .04em;
+    }
+
+    /* ── Code block ── */
+    .code-block {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.3rem 1.4rem;
+      font-family: var(--mono);
+      font-size: .78rem;
+      line-height: 1.9;
+      overflow-x: auto;
+      color: var(--text-2);
+    }
+    .code-block .kw  { color: #7c3aed; }
+    .code-block .fn  { color: #2563eb; }
+    .code-block .str { color: #16a34a; }
+    .code-block .cm  { color: var(--text-faint); }
+    .code-block .num { color: #d97706; }
+
+    /* ── Why LinearSVC cards ── */
+    .reason-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: .75rem;
+    }
+    .reason-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem 1.1rem;
+      transition: border-color .2s, box-shadow .2s, transform .2s;
+    }
+    .reason-card:hover {
+      border-color: #bfdbfe;
+      box-shadow: 0 4px 14px rgba(37,99,235,.08);
+      transform: translateY(-2px);
+    }
+    .reason-icon {
+      width: 34px; height: 34px;
+      background: var(--accent-bg);
+      border: 1px solid #bfdbfe;
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent);
+      font-size: .85rem;
+      margin-bottom: .75rem;
+    }
+    .reason-title {
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: .35rem;
+      letter-spacing: -.01em;
+    }
+    .reason-desc {
+      font-size: .78rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* ── Footer ── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2.5rem;
+      font-size: .75rem;
+      font-weight: 500;
+      color: var(--text-faint);
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: .5rem;
+      background: var(--surface);
+    }
+    .footer-links { display: flex; gap: 1.5rem; }
+    footer a { color: var(--text-muted); text-decoration: none; transition: color .15s; }
+    footer a:hover { color: var(--accent); }
+
+    @media (max-width: 600px) {
+      .navbar { padding: 0 1.2rem; }
+      .card-block { padding: 1.5rem 1.2rem; }
+      .page-header { padding: 3rem 1rem 2rem; }
+      .pipeline { flex-direction: column; }
+      .pipe-step { border-radius: 0 !important; min-width: unset; }
+      .pipe-step:first-child { border-radius: 10px 10px 0 0 !important; }
+      .pipe-step:last-child  { border-radius: 0 0 10px 10px !important; }
+      .pipe-step:not(:last-child)::after { content: '↓'; right: 50%; top: unset; bottom: -14px; transform: translateX(50%); }
+      .model-name { width: 120px; }
+      footer { padding: 1.2rem; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">
+      <div class="brand-logo"><i class="fa fa-shield-halved"></i></div>
+      SmishGuard
+      <span class="brand-tag">v2.0</span>
+    </a>
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <i class="fa fa-bars" style="color:var(--text-muted)"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto gap-1 align-items-center">
+        <li class="nav-item"><a class="nav-link" href="/">Detect</a></li>
+        <li class="nav-item"><a class="nav-link active" href="/model">Model</a></li>
+        <li class="nav-item"><a class="nav-link" href="/dataset">Dataset</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+      </ul>
     </div>
   </div>
+</nav>
+
+<!-- ── Page header ── -->
+<div class="page-header">
+  <div class="page-tag"><i class="fa fa-microchip" style="font-size:.6rem"></i> Model Architecture</div>
+  <h1>How the <em>Model</em> Works</h1>
+  <p>LinearSVC + TF-IDF — trained, evaluated, and deployed.</p>
+</div>
+
+<!-- ── Content ── -->
+<div class="content-wrap">
 
   <!-- Pipeline -->
-  <div class="section-block">
-    <h2 class="section-title">Inference Pipeline</h2>
-    <div class="pipeline-list">
-      <div class="pipeline-node glass-card-sm">
-        <span class="node-num">01</span>
-        <div class="node-body">
-          <h5>Data Preprocessing</h5>
-          <p>Raw SMS is lowercased, stripped of punctuation and noise, and stopwords are removed to produce a clean token stream.</p>
-        </div>
+  <div class="card-block">
+    <div class="block-title"><i class="fa fa-diagram-project"></i> Processing Pipeline</div>
+    <div class="pipeline">
+      <div class="pipe-step">
+        <div class="pipe-icon"><i class="fa fa-message"></i></div>
+        <div class="pipe-name">Raw SMS</div>
+        <div class="pipe-desc">User input text, any length up to 1600 chars</div>
       </div>
-      <div class="pipe-arrow" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      <div class="pipe-step">
+        <div class="pipe-icon"><i class="fa fa-broom"></i></div>
+        <div class="pipe-name">Cleaning</div>
+        <div class="pipe-desc">Lowercase, strip punctuation, remove noise</div>
       </div>
-      <div class="pipeline-node glass-card-sm">
-        <span class="node-num">02</span>
-        <div class="node-body">
-          <h5>TF-IDF Feature Extraction</h5>
-          <p>Tokens are transformed into a high-dimensional sparse numerical vector using a fitted TF-IDF vectoriser.</p>
-        </div>
+      <div class="pipe-step">
+        <div class="pipe-icon"><i class="fa fa-table-cells"></i></div>
+        <div class="pipe-name">TF-IDF</div>
+        <div class="pipe-desc">Vectorize into weighted term-frequency features</div>
       </div>
-      <div class="pipe-arrow" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      <div class="pipe-step">
+        <div class="pipe-icon"><i class="fa fa-brain"></i></div>
+        <div class="pipe-name">LinearSVC</div>
+        <div class="pipe-desc">Binary classification: ham (0) vs threat (1)</div>
       </div>
-      <div class="pipeline-node glass-card-sm">
-        <span class="node-num">03</span>
-        <div class="node-body">
-          <h5>SVM Classification</h5>
-          <p>The feature vector is passed to a trained linear SVM which finds the maximum-margin hyperplane separating spam from ham.</p>
-        </div>
-      </div>
-      <div class="pipe-arrow" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-      </div>
-      <div class="pipeline-node glass-card-sm">
-        <span class="node-num">04</span>
-        <div class="node-body">
-          <h5>Real-time Prediction</h5>
-          <p>The label and confidence are serialised as JSON and returned by the REST endpoint in under 50 ms.</p>
-        </div>
+      <div class="pipe-step">
+        <div class="pipe-icon"><i class="fa fa-flag"></i></div>
+        <div class="pipe-name">Result</div>
+        <div class="pipe-desc">Legitimate SMS or Spam / Smishing verdict</div>
       </div>
     </div>
   </div>
 
-  <!-- Why SVM -->
-  <div class="section-block">
-    <h2 class="section-title">Why SVM?</h2>
+  <!-- Metrics -->
+  <div class="card-block">
+    <div class="block-title"><i class="fa fa-chart-bar"></i> Performance Metrics</div>
+    <div class="metrics-grid">
+      <div class="metric-cell">
+        <div class="metric-val">98.4%</div>
+        <div class="metric-lbl">Accuracy</div>
+        <div class="metric-sub">Overall test set</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-val">97.8%</div>
+        <div class="metric-lbl">Precision</div>
+        <div class="metric-sub">Threat class</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-val">98.1%</div>
+        <div class="metric-lbl">Recall</div>
+        <div class="metric-sub">Threat class</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-val">97.9%</div>
+        <div class="metric-lbl">F1 Score</div>
+        <div class="metric-sub">Weighted avg</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-val">5-Fold</div>
+        <div class="metric-lbl">CV Strategy</div>
+        <div class="metric-sub">Cross-validation</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Model Comparison -->
+  <div class="card-block">
+    <div class="block-title"><i class="fa fa-scale-balanced"></i> Model Comparison</div>
+    <div id="comparisonChart"></div>
+  </div>
+
+  <!-- TF-IDF config -->
+  <div class="card-block">
+    <div class="block-title"><i class="fa fa-sliders"></i> TF-IDF Vectorizer Config</div>
+    <div class="code-block">
+<span class="kw">from</span> sklearn.feature_extraction.text <span class="kw">import</span> <span class="fn">TfidfVectorizer</span>
+
+vectorizer = <span class="fn">TfidfVectorizer</span>(
+    <span class="cm"># Remove English stop words (the, is, at...)</span>
+    stop_words=<span class="str">'english'</span>,
+
+    <span class="cm"># Consider 1-gram and 2-gram token combinations</span>
+    ngram_range=(<span class="num">1</span>, <span class="num">2</span>),
+
+    <span class="cm"># Keep only top 10,000 features by frequency</span>
+    max_features=<span class="num">10000</span>,
+
+    <span class="cm"># Ignore terms that appear in > 95% of docs (too common)</span>
+    max_df=<span class="num">0.95</span>,
+
+    <span class="cm"># Ignore terms that appear in < 2 documents (too rare)</span>
+    min_df=<span class="num">2</span>,
+)
+    </div>
+  </div>
+
+  <!-- Why LinearSVC -->
+  <div class="card-block">
+    <div class="block-title"><i class="fa fa-circle-info"></i> Why LinearSVC?</div>
     <div class="reason-grid">
-      <div class="glass-card-sm reason-card">
-        <h6>High-Dimensional Performance</h6>
-        <p>SVMs excel in sparse, high-dimensional spaces — exactly what TF-IDF produces from text corpora.</p>
+      <div class="reason-card">
+        <div class="reason-icon"><i class="fa fa-bolt"></i></div>
+        <div class="reason-title">Speed</div>
+        <div class="reason-desc">Trains and infers in milliseconds — ideal for real-time SMS classification.</div>
       </div>
-      <div class="glass-card-sm reason-card">
-        <h6>Strong Generalisation</h6>
-        <p>Maximum-margin classification minimises overfitting, so the model holds up on unseen messages.</p>
+      <div class="reason-card">
+        <div class="reason-icon"><i class="fa fa-arrows-to-dot"></i></div>
+        <div class="reason-title">High Dimensionality</div>
+        <div class="reason-desc">Excels with sparse TF-IDF matrices where feature count exceeds sample count.</div>
       </div>
-      <div class="glass-card-sm reason-card">
-        <h6>Lightweight Inference</h6>
-        <p>No GPU required. A serialised SVM predicts in microseconds, enabling sub-50 ms API responses.</p>
+      <div class="reason-card">
+        <div class="reason-icon"><i class="fa fa-chart-line"></i></div>
+        <div class="reason-title">Generalization</div>
+        <div class="reason-desc">Strong regularization prevents overfitting on limited smishing samples.</div>
       </div>
-      <div class="glass-card-sm reason-card">
-        <h6>Proven on NLP Tasks</h6>
-        <p>SVMs have a strong benchmark track record on spam, sentiment, and short-text classification.</p>
+      <div class="reason-card">
+        <div class="reason-icon"><i class="fa fa-trophy"></i></div>
+        <div class="reason-title">Best in Class</div>
+        <div class="reason-desc">Outperformed Naive Bayes, Logistic Regression, and Random Forest on this task.</div>
       </div>
     </div>
   </div>
 
 </div>
-{% endblock %}
+
+<!-- ── Footer ── -->
+<footer>
+  <span>© 2025 SmishGuard — NLP-Based Smishing Detection System</span>
+  <div class="footer-links">
+    <a href="/">Detector</a>
+    <a href="/dataset">Dataset</a>
+    <a href="/about">About</a>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Build comparison chart — logic unchanged from original
+  const models = [
+    { name: 'LinearSVC',           acc: 98.4, winner: true  },
+    { name: 'Logistic Regression', acc: 97.6, winner: false },
+    { name: 'Random Forest',       acc: 96.8, winner: false },
+    { name: 'Naive Bayes',         acc: 95.2, winner: false },
+  ];
+
+  const container = document.getElementById('comparisonChart');
+  models.forEach(m => {
+    const row = document.createElement('div');
+    row.className = 'comparison-row';
+    row.innerHTML = `
+      <div class="model-name${m.winner ? ' winner' : ''}">
+        ${m.name}
+        ${m.winner ? '<span class="badge-winner">SELECTED</span>' : ''}
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-fill${m.winner ? ' winner' : ''}" style="width:0" data-w="${m.acc}%"></div>
+      </div>
+      <div class="acc-val${m.winner ? ' winner' : ''}">${m.acc}%</div>
+    `;
+    container.appendChild(row);
+  });
+
+  // Animate bars on load
+  setTimeout(() => {
+    document.querySelectorAll('.bar-fill').forEach(b => {
+      b.style.width = b.dataset.w;
+    });
+  }, 200);
+</script>
+</body>
+</html>

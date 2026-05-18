@@ -1,165 +1,615 @@
-{% extends "base.html" %}
-{% block title %}Home — SmishGuard AI{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmishGuard — SMS Threat Detector</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:          #f7f8fc;
+      --surface:     #ffffff;
+      --surface-2:   #f0f2f8;
+      --border:      #e2e6f0;
+      --border-dark: #c8cfdf;
+      --accent:      #2563eb;
+      --accent-dim:  #3b82f6;
+      --accent-bg:   #eff5ff;
+      --danger:      #dc2626;
+      --danger-bg:   #fef2f2;
+      --danger-border: #fecaca;
+      --safe:        #16a34a;
+      --safe-bg:     #f0fdf4;
+      --safe-border: #bbf7d0;
+      --text:        #0f172a;
+      --text-2:      #334155;
+      --text-muted:  #64748b;
+      --text-faint:  #94a3b8;
+      --mono:        'DM Mono', monospace;
+      --sans:        'Sora', sans-serif;
+      --radius:      12px;
+      --shadow-sm:   0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04);
+      --shadow:      0 4px 16px rgba(15,23,42,.08), 0 1px 4px rgba(15,23,42,.04);
+      --shadow-lg:   0 12px 40px rgba(15,23,42,.1), 0 2px 8px rgba(15,23,42,.05);
+    }
 
-{% block content %}
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<!-- Hero -->
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Subtle dot grid */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image: radial-gradient(circle, #d1d5e8 1px, transparent 1px);
+      background-size: 28px 28px;
+      opacity: .45;
+      pointer-events: none;
+    }
+
+    /* ── Navbar ── */
+    .navbar {
+      background: rgba(255,255,255,.88);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 0 2.5rem;
+      height: 64px;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .navbar-brand {
+      font-family: var(--sans);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text) !important;
+      display: flex; align-items: center; gap: .65rem;
+      letter-spacing: -.02em;
+    }
+    .brand-logo {
+      width: 34px; height: 34px;
+      background: var(--accent);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: .9rem;
+      box-shadow: 0 2px 8px rgba(37,99,235,.35);
+    }
+    .brand-logo i { line-height: 1; }
+    .brand-tag {
+      font-size: .62rem;
+      font-weight: 500;
+      font-family: var(--mono);
+      color: var(--accent);
+      background: var(--accent-bg);
+      border: 1px solid #bfdbfe;
+      border-radius: 4px;
+      padding: .1rem .4rem;
+      letter-spacing: .04em;
+      margin-left: .1rem;
+      align-self: center;
+    }
+    .nav-link {
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--text-muted) !important;
+      padding: .4rem .85rem !important;
+      border-radius: 7px;
+      transition: color .18s, background .18s;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: var(--accent) !important;
+      background: var(--accent-bg);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative; z-index: 1;
+      padding: 5rem 1.5rem 2.5rem;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-family: var(--mono);
+      font-size: .7rem;
+      font-weight: 400;
+      color: var(--accent);
+      background: var(--accent-bg);
+      border: 1px solid #bfdbfe;
+      border-radius: 100px;
+      padding: .3rem 1rem;
+      margin-bottom: 1.8rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .hero-badge .pulse {
+      width: 7px; height: 7px;
+      background: #22c55e;
+      border-radius: 50%;
+      animation: pulse-dot 2.2s infinite;
+      box-shadow: 0 0 0 0 rgba(34,197,94,.5);
+    }
+    @keyframes pulse-dot {
+      0%   { box-shadow: 0 0 0 0 rgba(34,197,94,.45); }
+      60%  { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+      100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -.04em;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+      position: relative;
+    }
+    .hero h1 em::after {
+      content: '';
+      position: absolute;
+      bottom: 2px; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), #60a5fa);
+      border-radius: 4px;
+      opacity: .4;
+    }
+    .hero p.lead {
+      font-size: 1.05rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.75;
+    }
+
+    /* ── Main card ── */
+    .main-card {
+      position: relative; z-index: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 2.4rem 2.4rem 2rem;
+      max-width: 740px;
+      margin: 2.2rem auto 2rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .field-label {
+      display: flex; align-items: center; gap: .5rem;
+      font-size: .72rem;
+      font-weight: 600;
+      font-family: var(--mono);
+      color: var(--text-muted);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: .6rem;
+    }
+    .field-label i { font-size: .65rem; color: var(--text-faint); }
+
+    /* ── Textarea ── */
+    .sms-textarea {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: .875rem;
+      padding: 1rem 1.2rem;
+      resize: vertical;
+      min-height: 140px;
+      line-height: 1.75;
+      transition: border-color .22s, box-shadow .22s, background .2s;
+      outline: none;
+    }
+    .sms-textarea:focus {
+      border-color: var(--accent);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+    }
+    .sms-textarea::placeholder { color: var(--text-faint); }
+
+    .char-counter {
+      font-family: var(--mono);
+      font-size: .7rem;
+      color: var(--text-faint);
+      text-align: right;
+      margin-top: .4rem;
+    }
+    .char-counter.warn { color: #d97706; }
+    .char-counter.over { color: var(--danger); }
+
+    /* ── Example pills ── */
+    .examples-wrap { display: flex; flex-wrap: wrap; gap: .45rem; margin: 1.1rem 0 1.6rem; }
+    .example-pill {
+      font-family: var(--mono);
+      font-size: .68rem;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: .28rem .85rem;
+      color: var(--text-muted);
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color .18s, color .18s, background .18s, box-shadow .18s;
+      white-space: nowrap;
+    }
+    .example-pill:hover {
+      border-color: var(--accent-dim);
+      color: var(--accent);
+      background: var(--accent-bg);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.06);
+    }
+
+    /* ── Divider ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.6rem 0;
+    }
+
+    /* ── Scan button ── */
+    .btn-scan {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: .9rem;
+      font-family: var(--sans);
+      font-size: .9rem;
+      font-weight: 600;
+      letter-spacing: -.01em;
+      cursor: pointer;
+      transition: background .18s, box-shadow .2s, transform .12s;
+      display: flex; align-items: center; justify-content: center; gap: .55rem;
+      box-shadow: 0 2px 12px rgba(37,99,235,.3), 0 1px 3px rgba(37,99,235,.2);
+    }
+    .btn-scan:hover {
+      background: #1d4ed8;
+      box-shadow: 0 4px 20px rgba(37,99,235,.38), 0 1px 4px rgba(37,99,235,.2);
+    }
+    .btn-scan:active { transform: scale(.99); }
+    .btn-scan:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+    /* ── Result panel ── */
+    .result-panel {
+      margin-top: 1.6rem;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      overflow: hidden;
+      display: none;
+    }
+    .result-panel.show {
+      display: block;
+      animation: fadeUp .32s cubic-bezier(.22,.61,.36,1);
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(8px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    .result-panel.threat { border-color: var(--danger-border); }
+    .result-panel.safe   { border-color: var(--safe-border); }
+
+    .result-header {
+      padding: 1.2rem 1.5rem;
+      display: flex; align-items: center; gap: 1.1rem;
+      border-bottom: 1px solid transparent;
+    }
+    .result-panel.threat .result-header {
+      background: var(--danger-bg);
+      border-bottom-color: var(--danger-border);
+    }
+    .result-panel.safe .result-header {
+      background: var(--safe-bg);
+      border-bottom-color: var(--safe-border);
+    }
+
+    .result-icon {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    .result-panel.threat .result-icon { background: #fee2e2; color: var(--danger); }
+    .result-panel.safe   .result-icon { background: #dcfce7; color: var(--safe); }
+
+    .result-title {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+    }
+    .result-panel.threat .result-title { color: var(--danger); }
+    .result-panel.safe   .result-title { color: var(--safe); }
+    .result-sub { font-size: .8rem; color: var(--text-muted); margin-top: .2rem; }
+
+    .result-body { padding: 1.1rem 1.5rem 1.3rem; background: #fff; }
+    .result-tip { font-size: .85rem; color: var(--text-2); line-height: 1.7; }
+    .result-tip strong { font-weight: 600; }
+
+    /* ── Stats strip ── */
+    .stats-strip {
+      position: relative; z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      max-width: 740px;
+      margin: 0 auto 5rem;
+    }
+    .stat-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.3rem 1rem 1.1rem;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow .2s, transform .2s;
+    }
+    .stat-box:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-2px);
+    }
+    .stat-num {
+      font-family: var(--mono);
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: -.02em;
+    }
+    .stat-lbl {
+      font-size: .68rem;
+      font-weight: 600;
+      color: var(--text-faint);
+      margin-top: .3rem;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+    }
+
+    /* ── Spinner ── */
+    .spinner {
+      display: inline-block;
+      width: 15px; height: 15px;
+      border: 2px solid rgba(255,255,255,.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Footer ── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2.5rem;
+      font-size: .75rem;
+      font-weight: 500;
+      color: var(--text-faint);
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: .5rem;
+      background: var(--surface);
+    }
+    footer a { color: var(--text-muted); text-decoration: none; transition: color .15s; }
+    footer a:hover { color: var(--accent); }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-right { display: flex; align-items: center; gap: .5rem; }
+    .footer-dot { color: var(--border-dark); }
+
+    @media (max-width: 640px) {
+      .navbar { padding: 0 1.2rem; }
+      .main-card { margin: 1rem; padding: 1.5rem 1.2rem; }
+      .stats-strip { grid-template-columns: repeat(2, 1fr); margin: 0 1rem 4rem; }
+      .hero { padding: 3rem 1rem 2rem; }
+      footer { padding: 1.2rem; flex-direction: column; align-items: flex-start; }
+      .footer-links { gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">
+      <div class="brand-logo"><i class="fa fa-shield-halved"></i></div>
+      SmishGuard
+      <span class="brand-tag">v2.0</span>
+    </a>
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <i class="fa fa-bars" style="color:var(--text-muted)"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto gap-1 align-items-center">
+        <li class="nav-item"><a class="nav-link active" href="/">Detect</a></li>
+        <li class="nav-item"><a class="nav-link" href="/model">Model</a></li>
+        <li class="nav-item"><a class="nav-link" href="/dataset">Dataset</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
 <section class="hero">
-  <div class="hero-content">
-    <div class="hero-eyebrow">
-      <span class="live-dot" aria-hidden="true"></span>
-      Real-time threat analysis
-    </div>
-
-    <h1 class="hero-title">
-      Detect Smishing<br>
-      <span class="gradient-text">Before It Hits</span>
-    </h1>
-
-    <p class="hero-body">
-      Paste any SMS and our SVM + TF-IDF engine classifies it as
-      legitimate, spam, or a smishing attack — instantly.
-    </p>
+  <div class="hero-badge">
+    <span class="pulse"></span>
+    NLP · SVM · Real-time Detection
   </div>
+  <h1>Detect <em>Smishing</em> Attacks<br>Before They Strike</h1>
+  <p class="lead">Paste any suspicious SMS below. Our LinearSVC model — trained on 5,971 real messages — classifies threats in milliseconds.</p>
 </section>
 
-<!-- Scanner -->
-<section class="scanner-wrap">
-  <div class="glass-card scanner-card">
+<!-- ── Main Card ── -->
+<div class="main-card container px-3">
 
-    <div class="card-chrome">
-      <div class="chrome-dots" aria-hidden="true">
-        <i></i><i></i><i></i>
+  <div class="field-label">
+    <i class="fa fa-comment-sms"></i>
+    SMS Message
+  </div>
+  <textarea id="smsInput" class="sms-textarea" maxlength="1600"
+    placeholder="Paste the message here — e.g. &quot;Congratulations! You've won a $1,000 gift card. Claim now: http://bit.ly/xxxxx&quot;"></textarea>
+  <div class="char-counter"><span id="charCount">0</span> / 1600 characters</div>
+
+  <div class="field-label mt-4">
+    <i class="fa fa-bolt"></i>
+    Quick Examples
+  </div>
+  <div class="examples-wrap">
+    <button class="example-pill" data-text="Hi! Are we still on for dinner tonight at 7?">✓ Legit — Dinner plans</button>
+    <button class="example-pill" data-text="URGENT: Your bank account has been suspended. Verify now: http://bank-secure.xyz/login">⚠ Smishing — Bank alert</button>
+    <button class="example-pill" data-text="Your Amazon package is delayed. Click to reschedule: http://amzn-delivery.biz/track">⚠ Smishing — Delivery</button>
+    <button class="example-pill" data-text="Hey, did you see the match last night? Crazy ending!">✓ Legit — Casual chat</button>
+  </div>
+
+  <hr class="divider">
+
+  <button class="btn-scan" id="scanBtn" onclick="analyzeMessage()">
+    <i class="fa fa-magnifying-glass"></i>
+    Analyze Message
+  </button>
+
+  <!-- Result -->
+  <div class="result-panel" id="resultPanel">
+    <div class="result-header">
+      <div class="result-icon" id="resultIcon"></div>
+      <div>
+        <div class="result-title" id="resultTitle"></div>
+        <div class="result-sub" id="resultSub"></div>
       </div>
-      <span class="chrome-label">sms_scanner.py</span>
-      <span class="chrome-badge">● live</span>
     </div>
-
-    <div class="card-body-inner">
-      <label class="field-label" for="sms">Input Message</label>
-      <div class="textarea-wrap">
-        <textarea
-          id="sms"
-          class="sms-input"
-          rows="5"
-          placeholder="Paste SMS here — e.g. 'Congratulations! Click to claim your prize…'"
-          aria-label="SMS message to analyse"
-          maxlength="1600"
-        ></textarea>
-        <span class="char-count" id="charCount">0 / 1600</span>
-      </div>
-
-      <button class="btn-analyse" id="scanBtn" onclick="scanSMS()">
-        <span id="btnLabel">Analyse Message</span>
-        <svg id="btnArrow" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-          <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
-        </svg>
-        <svg id="btnSpinner" class="spinner" viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true" hidden>
-          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="56" stroke-dashoffset="14"/>
-        </svg>
-      </button>
-
-      <!-- Result -->
-      <div id="resultBox" class="result-box" role="alert" aria-live="polite" hidden>
-        <div class="result-icon-wrap" id="resultIcon"></div>
-        <div class="result-text">
-          <span class="result-verdict" id="resultVerdict"></span>
-          <span class="result-sub" id="resultSub"></span>
-        </div>
-      </div>
+    <div class="result-body">
+      <div class="result-tip" id="resultTip"></div>
     </div>
   </div>
-</section>
 
-<!-- Stats -->
-<section class="stats-strip">
-  <div class="stats-glass">
-    <div class="stat">
-      <span class="stat-val">99.2<sup>%</sup></span>
-      <span class="stat-lbl">Accuracy</span>
-    </div>
-    <div class="stat-rule" aria-hidden="true"></div>
-    <div class="stat">
-      <span class="stat-val">&lt;50<sup>ms</sup></span>
-      <span class="stat-lbl">Latency</span>
-    </div>
-    <div class="stat-rule" aria-hidden="true"></div>
-    <div class="stat">
-      <span class="stat-val">3<sup>+</sup></span>
-      <span class="stat-lbl">Threat Classes</span>
-    </div>
-    <div class="stat-rule" aria-hidden="true"></div>
-    <div class="stat">
-      <span class="stat-val">SVM</span>
-      <span class="stat-lbl">Algorithm</span>
+</div>
+
+<!-- ── Stats Strip ── -->
+<div class="stats-strip container px-3">
+  <div class="stat-box">
+    <div class="stat-num">5,971</div>
+    <div class="stat-lbl">Training Samples</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-num">98.4%</div>
+    <div class="stat-lbl">Accuracy</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-num">SVM</div>
+    <div class="stat-lbl">Algorithm</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-num">TF-IDF</div>
+    <div class="stat-lbl">Features</div>
+  </div>
+</div>
+
+<!-- ── Footer ── -->
+<footer>
+  <span>© 2025 SmishGuard — NLP-Based Smishing Detection System</span>
+  <div class="footer-right">
+    <div class="footer-links">
+      <a href="/model">Model Info</a>
+      <a href="/dataset">Dataset</a>
+      <a href="/about">About</a>
     </div>
   </div>
-</section>
+</footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
 <script>
-const textarea  = document.getElementById('sms');
-const charCount = document.getElementById('charCount');
+  const textarea    = document.getElementById('smsInput');
+  const charCount   = document.getElementById('charCount');
+  const scanBtn     = document.getElementById('scanBtn');
+  const resultPanel = document.getElementById('resultPanel');
 
-textarea.addEventListener('input', () => {
-  const len = textarea.value.length;
-  charCount.textContent = `${len} / 1600`;
-  charCount.classList.toggle('warn', len > 1400);
-});
+  textarea.addEventListener('input', () => {
+    const n = textarea.value.length;
+    charCount.textContent = n;
+    charCount.parentElement.className = 'char-counter' + (n > 1400 ? ' over' : n > 1000 ? ' warn' : '');
+  });
 
-async function scanSMS() {
-  const sms = textarea.value.trim();
-  if (!sms) { pulse(textarea); return; }
-
-  const btn      = document.getElementById('scanBtn');
-  const label    = document.getElementById('btnLabel');
-  const arrow    = document.getElementById('btnArrow');
-  const spinner  = document.getElementById('btnSpinner');
-  const resultBox = document.getElementById('resultBox');
-
-  btn.disabled   = true;
-  label.textContent = 'Analysing…';
-  arrow.hidden   = true;
-  spinner.hidden = false;
-  resultBox.hidden = true;
-
-  try {
-    const res  = await fetch('/predict', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sms })
+  document.querySelectorAll('.example-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      textarea.value = btn.dataset.text;
+      textarea.dispatchEvent(new Event('input'));
+      resultPanel.classList.remove('show', 'threat', 'safe');
     });
-    const data = await res.json();
+  });
 
-    if (!res.ok) throw new Error(data.error || 'Server error');
+  async function analyzeMessage() {
+    const sms = textarea.value.trim();
+    if (!sms) { textarea.focus(); return; }
 
-    const safe = data.label === 'safe';
-    resultBox.className = 'result-box ' + (safe ? 'result-safe' : 'result-threat');
-    document.getElementById('resultIcon').innerHTML = safe
-      ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
-      : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
-    document.getElementById('resultVerdict').textContent = safe ? 'Legitimate Message' : 'Threat Detected';
-    document.getElementById('resultSub').textContent = data.prediction;
-    resultBox.hidden = false;
+    scanBtn.disabled = true;
+    scanBtn.innerHTML = '<span class="spinner"></span> Analyzing…';
+    resultPanel.classList.remove('show', 'threat', 'safe');
 
-  } catch (err) {
-    resultBox.className = 'result-box result-error';
-    document.getElementById('resultIcon').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
-    document.getElementById('resultVerdict').textContent = 'Request Failed';
-    document.getElementById('resultSub').textContent = err.message;
-    resultBox.hidden = false;
-  } finally {
-    btn.disabled = false;
-    label.textContent = 'Analyse Message';
-    arrow.hidden  = false;
-    spinner.hidden = true;
+    try {
+      const resp = await fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sms })
+      });
+      const data = await resp.json();
+      if (!resp.ok) { showError(data.error || 'Unexpected error.'); return; }
+      showResult(data);
+    } catch (e) {
+      showError('Network error — is the server running?');
+    } finally {
+      scanBtn.disabled = false;
+      scanBtn.innerHTML = '<i class="fa fa-magnifying-glass"></i> Analyze Message';
+    }
   }
-}
 
-function pulse(el) {
-  el.classList.remove('shake');
-  void el.offsetWidth;
-  el.classList.add('shake');
-  el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
-}
+  function showResult(data) {
+    const isThreat = data.label === 'threat';
+    resultPanel.className = 'result-panel show ' + (isThreat ? 'threat' : 'safe');
+
+    document.getElementById('resultIcon').innerHTML = isThreat
+      ? '<i class="fa fa-triangle-exclamation"></i>'
+      : '<i class="fa fa-circle-check"></i>';
+
+    document.getElementById('resultTitle').textContent = data.prediction;
+
+    if (isThreat) {
+      document.getElementById('resultSub').textContent = 'High-risk message — potential smishing attack';
+      document.getElementById('resultTip').innerHTML = `
+        <strong style="color:var(--danger)">Do not interact with this message.</strong>
+        It exhibits patterns strongly associated with smishing or spam. Avoid clicking any links,
+        calling back numbers, or sharing personal or financial information.
+        Report it to your carrier by forwarding to <strong>7726 (SPAM)</strong>.`;
+    } else {
+      document.getElementById('resultSub').textContent = 'No threat indicators found';
+      document.getElementById('resultTip').innerHTML = `
+        <strong style="color:var(--safe)">Message appears safe.</strong>
+        No smishing patterns were detected. That said, no automated system is 100% accurate —
+        if anything feels off, trust your instincts and verify with the sender through a known channel.`;
+    }
+
+    resultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function showError(msg) {
+    resultPanel.className = 'result-panel show threat';
+    document.getElementById('resultIcon').innerHTML = '<i class="fa fa-circle-xmark"></i>';
+    document.getElementById('resultTitle').textContent = 'Analysis Failed';
+    document.getElementById('resultSub').textContent = 'Could not complete the request';
+    document.getElementById('resultTip').innerHTML = `<span style="color:var(--danger)">${msg}</span>`;
+  }
+
+  textarea.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') analyzeMessage();
+  });
 </script>
-{% endblock %}
+</body>
+</html>
