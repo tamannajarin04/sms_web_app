@@ -1,549 +1,192 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SmishGuard — About</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet"/>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <style>
-    :root {
-      --bg:           #f7f8fc;
-      --surface:      #ffffff;
-      --surface-2:    #f0f2f8;
-      --border:       #e2e6f0;
-      --border-dark:  #c8cfdf;
-      --accent:       #2563eb;
-      --accent-dim:   #3b82f6;
-      --accent-bg:    #eff5ff;
-      --danger:       #dc2626;
-      --danger-bg:    #fef2f2;
-      --danger-border:#fecaca;
-      --safe:         #16a34a;
-      --safe-bg:      #f0fdf4;
-      --safe-border:  #bbf7d0;
-      --warn:         #d97706;
-      --text:         #0f172a;
-      --text-2:       #334155;
-      --text-muted:   #64748b;
-      --text-faint:   #94a3b8;
-      --mono:         'DM Mono', monospace;
-      --sans:         'Sora', sans-serif;
-      --shadow-sm:    0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04);
-      --shadow:       0 4px 16px rgba(15,23,42,.08), 0 1px 4px rgba(15,23,42,.04);
-      --shadow-lg:    0 12px 40px rgba(15,23,42,.1), 0 2px 8px rgba(15,23,42,.05);
-    }
+{% extends "base.html" %}
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+{% block title %}SmishGuard AI — About{% endblock %}
 
-    body {
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
 
-    body::before {
-      content: '';
-      position: fixed; inset: 0; z-index: 0;
-      background-image: radial-gradient(circle, #d1d5e8 1px, transparent 1px);
-      background-size: 28px 28px;
-      opacity: .45;
-      pointer-events: none;
-    }
+{# ═══════════════════════════════════════════
+   PAGE-SPECIFIC STYLES
+═══════════════════════════════════════════ #}
+{% block head_extra %}
+<style>
 
-    /* ── Navbar ── */
-    .navbar {
-      background: rgba(255,255,255,.88);
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      padding: 0 2.5rem;
-      height: 64px;
-      position: sticky; top: 0; z-index: 100;
-      box-shadow: var(--shadow-sm);
-    }
-    .navbar-brand {
-      font-family: var(--sans);
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--text) !important;
-      display: flex; align-items: center; gap: .65rem;
-      letter-spacing: -.02em;
-    }
-    .brand-logo {
-      width: 34px; height: 34px;
-      background: var(--accent);
-      border-radius: 9px;
-      display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: .9rem;
-      box-shadow: 0 2px 8px rgba(37,99,235,.35);
-    }
-    .brand-tag {
-      font-size: .62rem;
-      font-weight: 500;
-      font-family: var(--mono);
-      color: var(--accent);
-      background: var(--accent-bg);
-      border: 1px solid #bfdbfe;
-      border-radius: 4px;
-      padding: .1rem .4rem;
-      letter-spacing: .04em;
-      margin-left: .1rem;
-      align-self: center;
-    }
-    .nav-link {
-      font-size: .82rem;
-      font-weight: 500;
-      color: var(--text-muted) !important;
-      padding: .4rem .85rem !important;
-      border-radius: 7px;
-      transition: color .18s, background .18s;
-    }
-    .nav-link:hover, .nav-link.active {
-      color: var(--accent) !important;
-      background: var(--accent-bg);
-    }
+  /* ── Tech Stack Grid ── */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+    gap: .8rem;
+  }
+  .tech-card {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 1.2rem .9rem 1rem;
+    text-align: center; cursor: default;
+    transition: border-color .2s, transform .2s, box-shadow .2s;
+  }
+  .tech-card:hover {
+    border-color: var(--safe-border);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+  }
+  .tech-icon { font-size: 1.6rem; margin-bottom: .55rem; line-height: 1; }
+  .tech-name { font-family: var(--mono); font-size: .75rem; color: var(--text); font-weight: 500; }
+  .tech-role { font-size: .65rem; color: var(--text-faint); margin-top: .15rem; }
 
-    /* ── Page header ── */
-    .page-header {
-      position: relative; z-index: 1;
-      padding: 4.5rem 1.5rem 2.5rem;
-      text-align: center;
-    }
-    .page-tag {
-      display: inline-flex; align-items: center; gap: .45rem;
-      font-family: var(--mono);
-      font-size: .7rem;
-      font-weight: 400;
-      color: var(--accent);
-      background: var(--accent-bg);
-      border: 1px solid #bfdbfe;
-      border-radius: 100px;
-      padding: .3rem 1rem;
-      margin-bottom: 1.4rem;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-    }
-    .page-header h1 {
-      font-size: clamp(2rem, 4.5vw, 3.2rem);
-      font-weight: 800;
-      letter-spacing: -.04em;
-      line-height: 1.12;
-      margin-bottom: .9rem;
-    }
-    .page-header h1 em {
-      font-style: normal;
-      color: var(--accent);
-      position: relative;
-    }
-    .page-header h1 em::after {
-      content: '';
-      position: absolute;
-      bottom: 2px; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--accent), #60a5fa);
-      border-radius: 4px;
-      opacity: .35;
-    }
-    .page-header p {
-      color: var(--text-muted);
-      font-size: .98rem;
-      line-height: 1.75;
-      max-width: 560px;
-      margin: 0 auto;
-    }
+  /* ── API Endpoints ── */
+  .endpoint-block {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden; margin-bottom: .75rem;
+  }
+  .endpoint-block:last-child { margin-bottom: 0; }
+  .endpoint-head {
+    padding: .8rem 1.2rem;
+    display: flex; align-items: center; gap: .75rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .endpoint-head.no-body { border-bottom: none; }
+  .method-pill {
+    font-family: var(--mono); font-size: .68rem; font-weight: 500;
+    padding: .2rem .65rem; border-radius: 5px; flex-shrink: 0;
+  }
+  .method-pill.post { background: var(--accent-light); color: var(--accent); border: 1px solid var(--safe-border); }
+  .method-pill.get  { background: var(--surface-3);   color: var(--text-muted); border: 1px solid var(--border); }
+  .endpoint-path { font-family: var(--mono); font-size: .82rem; color: var(--text); font-weight: 500; }
+  .endpoint-note { font-size: .76rem; color: var(--text-faint); margin-left: auto; }
+  .endpoint-body { padding: 1.1rem 1.2rem; }
+  .code-label {
+    font-family: var(--mono); font-size: .62rem; font-weight: 500;
+    color: var(--text-faint); text-transform: uppercase; letter-spacing: .1em;
+    margin-bottom: .45rem; margin-top: .9rem;
+  }
+  .code-label:first-child { margin-top: 0; }
 
-    /* ── Content wrap ── */
-    .content-wrap {
-      position: relative; z-index: 1;
-      max-width: 900px;
-      margin: 0 auto 5rem;
-      padding: 0 1.5rem;
-    }
+  /* ── Limitations ── */
+  .limit-list { list-style: none; display: flex; flex-direction: column; gap: .65rem; }
+  .limit-list li {
+    display: flex; align-items: flex-start; gap: .9rem;
+    font-size: .86rem; color: var(--text-muted); line-height: 1.65;
+    padding: .85rem 1.1rem; background: var(--surface-2);
+    border: 1px solid var(--border); border-radius: 9px;
+    transition: border-color .18s;
+  }
+  .limit-list li:hover { border-color: var(--warn-border); }
+  .warn-dot {
+    width: 24px; height: 24px; flex-shrink: 0; margin-top: .05rem;
+    background: var(--warn-bg); border: 1px solid var(--warn-border);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  }
+  .warn-dot i { font-size: .55rem; color: var(--warn); }
 
-    /* ── Card block ── */
-    .card-block {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2rem 2.2rem;
-      margin-bottom: 1.2rem;
-      box-shadow: var(--shadow-sm);
-      position: relative;
-      overflow: hidden;
-    }
-    .card-block::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 2rem; right: 2rem;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border-dark), transparent);
-    }
+  /* ── Responsive ── */
+  @media (max-width: 860px) {
+    .tech-grid    { grid-template-columns: repeat(3, 1fr); }
+    .endpoint-note { display: none; }
+  }
+</style>
+{% endblock %}
 
-    .block-title {
-      display: flex; align-items: center; gap: .6rem;
-      font-size: .72rem;
-      font-weight: 600;
-      font-family: var(--mono);
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      margin-bottom: 1.3rem;
-    }
-    .block-title::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-    .block-title i { font-size: .65rem; }
 
-    /* ── Body text ── */
-    .body-text {
-      font-size: .88rem;
-      color: var(--text-muted);
-      line-height: 1.8;
-      margin-bottom: .85rem;
-    }
-    .body-text:last-child { margin-bottom: 0; }
-    .body-text strong { color: var(--text-2); font-weight: 600; }
+{# ═══════════════════════════════════════════
+   PAGE CONTENT
+═══════════════════════════════════════════ #}
+{% block content %}
 
-    /* ── Tech grid ── */
-    .tech-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: .75rem;
-    }
-    .tech-card {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.2rem .8rem 1rem;
-      text-align: center;
-      transition: border-color .2s, transform .2s, box-shadow .2s;
-      cursor: default;
-    }
-    .tech-card:hover {
-      border-color: var(--accent-dim);
-      transform: translateY(-3px);
-      box-shadow: 0 6px 18px rgba(37,99,235,.1);
-    }
-    .tech-icon {
-      font-size: 1.65rem;
-      margin-bottom: .55rem;
-      line-height: 1;
-    }
-    .tech-name {
-      font-family: var(--mono);
-      font-size: .75rem;
-      color: var(--text);
-      font-weight: 500;
-    }
-    .tech-role {
-      font-size: .65rem;
-      color: var(--text-faint);
-      margin-top: .15rem;
-    }
-
-    /* ── API endpoints ── */
-    .endpoint-block {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-      margin-bottom: .75rem;
-    }
-    .endpoint-block:last-child { margin-bottom: 0; }
-    .endpoint-header {
-      padding: .8rem 1.2rem;
-      display: flex; align-items: center; gap: .75rem;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-    }
-    .endpoint-header:last-child { border-bottom: none; }
-    .method-badge {
-      font-family: var(--mono);
-      font-size: .68rem;
-      font-weight: 500;
-      padding: .2rem .6rem;
-      border-radius: 5px;
-      flex-shrink: 0;
-    }
-    .method-badge.post {
-      background: var(--accent-bg);
-      color: var(--accent);
-      border: 1px solid #bfdbfe;
-    }
-    .method-badge.get {
-      background: var(--safe-bg);
-      color: var(--safe);
-      border: 1px solid var(--safe-border);
-    }
-    .endpoint-path {
-      font-family: var(--mono);
-      font-size: .82rem;
-      color: var(--text);
-      font-weight: 500;
-    }
-    .endpoint-desc {
-      font-size: .76rem;
-      color: var(--text-faint);
-      margin-left: auto;
-    }
-    .endpoint-body {
-      padding: 1.1rem 1.2rem;
-    }
-    .code-label {
-      font-family: var(--mono);
-      font-size: .63rem;
-      font-weight: 500;
-      color: var(--text-faint);
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      margin-bottom: .45rem;
-      margin-top: .9rem;
-    }
-    .code-label:first-child { margin-top: 0; }
-    pre {
-      font-family: var(--mono);
-      font-size: .78rem;
-      line-height: 1.85;
-      color: var(--text-2);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: .9rem 1rem;
-      overflow-x: auto;
-      margin: 0;
-    }
-    .kw  { color: #7c3aed; }
-    .str { color: #16a34a; }
-    .num { color: #d97706; }
-    .key { color: #2563eb; }
-    .cm  { color: var(--text-faint); }
-
-    /* ── Limitations list ── */
-    .limit-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: .7rem;
-    }
-    .limit-list li {
-      display: flex;
-      align-items: flex-start;
-      gap: .85rem;
-      font-size: .85rem;
-      color: var(--text-muted);
-      line-height: 1.65;
-      padding: .75rem 1rem;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      transition: border-color .18s;
-    }
-    .limit-list li:hover { border-color: var(--border-dark); }
-    .limit-icon {
-      width: 22px; height: 22px;
-      background: #fef3c7;
-      border: 1px solid #fde68a;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      margin-top: .05rem;
-    }
-    .limit-icon i { font-size: .58rem; color: var(--warn); }
-
-    /* ── CTA ── */
-    .cta-block {
-      background: linear-gradient(135deg, var(--accent-bg) 0%, #fff 60%);
-      border: 1px solid #bfdbfe;
-      border-radius: 16px;
-      padding: 3rem 2rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-      margin-top: 1.2rem;
-    }
-    .cta-block::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 10%; right: 10%;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent-dim), transparent);
-      opacity: .4;
-    }
-    .cta-block::after {
-      content: '';
-      position: absolute;
-      bottom: -60px; right: -60px;
-      width: 200px; height: 200px;
-      background: radial-gradient(circle, rgba(37,99,235,.07), transparent 70%);
-      pointer-events: none;
-    }
-    .cta-title {
-      font-size: 1.5rem;
-      font-weight: 800;
-      letter-spacing: -.03em;
-      margin-bottom: .55rem;
-    }
-    .cta-sub {
-      color: var(--text-muted);
-      font-size: .9rem;
-      margin-bottom: 1.6rem;
-      line-height: 1.6;
-    }
-    .btn-cta {
-      display: inline-flex; align-items: center; gap: .6rem;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: .85rem 2rem;
-      font-family: var(--sans);
-      font-size: .9rem;
-      font-weight: 600;
-      text-decoration: none;
-      transition: background .18s, box-shadow .2s, transform .12s;
-      box-shadow: 0 2px 12px rgba(37,99,235,.3), 0 1px 3px rgba(37,99,235,.2);
-    }
-    .btn-cta:hover {
-      background: #1d4ed8;
-      color: #fff;
-      box-shadow: 0 4px 20px rgba(37,99,235,.38);
-      transform: translateY(-1px);
-    }
-
-    /* ── Footer ── */
-    footer {
-      position: relative; z-index: 1;
-      border-top: 1px solid var(--border);
-      padding: 1.5rem 2.5rem;
-      font-size: .75rem;
-      font-weight: 500;
-      color: var(--text-faint);
-      display: flex; justify-content: space-between; align-items: center;
-      flex-wrap: wrap; gap: .5rem;
-      background: var(--surface);
-    }
-    .footer-links { display: flex; gap: 1.5rem; }
-    footer a { color: var(--text-muted); text-decoration: none; transition: color .15s; }
-    footer a:hover { color: var(--accent); }
-
-    @media (max-width: 640px) {
-      .navbar { padding: 0 1.2rem; }
-      .card-block { padding: 1.5rem 1.2rem; }
-      .tech-grid { grid-template-columns: repeat(3, 1fr); }
-      .page-header { padding: 3rem 1rem 2rem; }
-      .endpoint-desc { display: none; }
-      footer { padding: 1.2rem; flex-direction: column; align-items: flex-start; }
-    }
-  </style>
-</head>
-<body>
-
-<!-- ── Navbar ── -->
-<nav class="navbar navbar-expand-lg">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="/">
-      <div class="brand-logo"><i class="fa fa-shield-halved"></i></div>
-      SmishGuard
-      <span class="brand-tag">v2.0</span>
-    </a>
-    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-      <i class="fa fa-bars" style="color:var(--text-muted)"></i>
-    </button>
-    <div class="collapse navbar-collapse" id="navMenu">
-      <ul class="navbar-nav ms-auto gap-1 align-items-center">
-        <li class="nav-item"><a class="nav-link" href="/">Detect</a></li>
-        <li class="nav-item"><a class="nav-link" href="/model">Model</a></li>
-        <li class="nav-item"><a class="nav-link" href="/dataset">Dataset</a></li>
-        <li class="nav-item"><a class="nav-link active" href="/about">About</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
-<!-- ── Page header ── -->
+<!-- ── Page Header ──────────────────────────── -->
 <div class="page-header">
-  <div class="page-tag"><i class="fa fa-file-lines" style="font-size:.6rem"></i> Project Overview</div>
-  <h1>About <em>SmishGuard</em></h1>
+  <div class="page-badge">
+    <i class="fa-solid fa-file-lines" style="font-size:.6rem"></i>
+    Project Overview
+  </div>
+  <h1>
+    <span class="word-green">About</span><br>
+    <span class="word-ghost">SmishGuard</span>
+  </h1>
   <p>An NLP-based smishing detection system built with scikit-learn, TF-IDF, and Flask — designed to protect users from SMS phishing attacks in real time.</p>
 </div>
 
-<!-- ── Content ── -->
+<!-- ── Content ──────────────────────────────── -->
 <div class="content-wrap">
 
-  <!-- What is smishing -->
-  <div class="card-block">
-    <div class="block-title"><i class="fa fa-circle-question"></i> What is Smishing?</div>
+  <!-- What is Smishing -->
+  <div class="section-card">
+    <div class="section-label">
+      <i class="fa-solid fa-circle-question"></i>
+      What is Smishing?
+    </div>
     <p class="body-text">
-      <strong>Smishing</strong> (SMS + Phishing) is a form of social engineering where attackers send deceptive text messages to trick recipients into revealing sensitive information, clicking malicious links, or making fraudulent payments.
+      <strong>Smishing</strong> (SMS + Phishing) is a form of social engineering where attackers
+      send deceptive text messages to trick recipients into revealing sensitive information,
+      clicking malicious links, or making fraudulent payments.
     </p>
     <p class="body-text">
-      Common tactics include fake bank alerts, prize notifications, package delivery scams, and government impersonation — often crafted with urgency cues to bypass critical thinking. SmishGuard uses machine learning to detect these linguistic patterns automatically.
+      Common tactics include fake bank alerts, prize notifications, package delivery scams,
+      and government impersonation — often crafted with urgency cues to bypass critical
+      thinking. SmishGuard uses machine learning to detect these linguistic patterns automatically.
     </p>
   </div>
 
-  <!-- Tech stack -->
-  <div class="card-block">
-    <div class="block-title"><i class="fa fa-layer-group"></i> Technology Stack</div>
+  <!-- Tech Stack -->
+  <div class="section-card">
+    <div class="section-label">
+      <i class="fa-solid fa-layer-group"></i>
+      Technology Stack
+    </div>
     <div class="tech-grid">
       <div class="tech-card">
-        <div class="tech-icon" style="color:#3776ab"><i class="fab fa-python"></i></div>
+        <div class="tech-icon" style="color:#3776ab"><i class="fa-brands fa-python"></i></div>
         <div class="tech-name">Python 3</div>
         <div class="tech-role">Core language</div>
       </div>
       <div class="tech-card">
-        <div class="tech-icon" style="color:#e44d26"><i class="fa fa-flask"></i></div>
+        <div class="tech-icon" style="color:#e44d26"><i class="fa-solid fa-flask"></i></div>
         <div class="tech-name">Flask</div>
         <div class="tech-role">Web framework</div>
       </div>
       <div class="tech-card">
-        <div class="tech-icon" style="color:#f7931e"><i class="fa fa-robot"></i></div>
+        <div class="tech-icon" style="color:#f7931e"><i class="fa-solid fa-robot"></i></div>
         <div class="tech-name">scikit-learn</div>
         <div class="tech-role">ML models</div>
       </div>
       <div class="tech-card">
-        <div class="tech-icon" style="color:#2563eb"><i class="fa fa-table-cells"></i></div>
+        <div class="tech-icon" style="color:var(--accent)"><i class="fa-solid fa-table-cells"></i></div>
         <div class="tech-name">TF-IDF</div>
         <div class="tech-role">Vectorization</div>
       </div>
       <div class="tech-card">
-        <div class="tech-icon" style="color:#150458"><i class="fa fa-chart-bar"></i></div>
+        <div class="tech-icon" style="color:#150458"><i class="fa-solid fa-chart-bar"></i></div>
         <div class="tech-name">pandas</div>
         <div class="tech-role">Data wrangling</div>
       </div>
       <div class="tech-card">
-        <div class="tech-icon" style="color:#7952b3"><i class="fab fa-bootstrap"></i></div>
+        <div class="tech-icon" style="color:#7952b3"><i class="fa-brands fa-bootstrap"></i></div>
         <div class="tech-name">Bootstrap 5</div>
         <div class="tech-role">UI framework</div>
       </div>
       <div class="tech-card">
-        <div class="tech-icon" style="color:#d4a017"><i class="fab fa-js"></i></div>
+        <div class="tech-icon" style="color:#d4a017"><i class="fa-brands fa-js"></i></div>
         <div class="tech-name">JavaScript</div>
         <div class="tech-role">Frontend logic</div>
       </div>
       <div class="tech-card">
-        <div class="tech-icon" style="color:#e05d35"><i class="fa fa-box"></i></div>
+        <div class="tech-icon" style="color:#e05d35"><i class="fa-solid fa-box"></i></div>
         <div class="tech-name">joblib</div>
         <div class="tech-role">Serialization</div>
       </div>
     </div>
   </div>
 
-  <!-- API reference -->
-  <div class="card-block">
-    <div class="block-title"><i class="fa fa-plug"></i> API Reference</div>
+  <!-- API Reference -->
+  <div class="section-card">
+    <div class="section-label">
+      <i class="fa-solid fa-plug"></i>
+      API Reference
+    </div>
 
+    <!-- POST /predict -->
     <div class="endpoint-block">
-      <div class="endpoint-header">
-        <span class="method-badge post">POST</span>
+      <div class="endpoint-head">
+        <span class="method-pill post">POST</span>
         <span class="endpoint-path">/predict</span>
-        <span class="endpoint-desc">Classify an SMS message</span>
+        <span class="endpoint-note">Classify an SMS message</span>
       </div>
       <div class="endpoint-body">
         <div class="code-label">Request Body (JSON)</div>
@@ -562,53 +205,59 @@
       </div>
     </div>
 
+    <!-- GET / -->
     <div class="endpoint-block">
-      <div class="endpoint-header">
-        <span class="method-badge get">GET</span>
+      <div class="endpoint-head no-body">
+        <span class="method-pill get">GET</span>
         <span class="endpoint-path">/</span>
-        <span class="endpoint-desc">Main detection UI</span>
+        <span class="endpoint-note">Main detection UI</span>
       </div>
     </div>
 
+    <!-- GET /model -->
     <div class="endpoint-block">
-      <div class="endpoint-header">
-        <span class="method-badge get">GET</span>
+      <div class="endpoint-head no-body">
+        <span class="method-pill get">GET</span>
         <span class="endpoint-path">/model</span>
-        <span class="endpoint-desc">Model architecture &amp; metrics</span>
+        <span class="endpoint-note">Model architecture &amp; metrics</span>
       </div>
     </div>
 
+    <!-- GET /dataset -->
     <div class="endpoint-block">
-      <div class="endpoint-header">
-        <span class="method-badge get">GET</span>
+      <div class="endpoint-head no-body">
+        <span class="method-pill get">GET</span>
         <span class="endpoint-path">/dataset</span>
-        <span class="endpoint-desc">Dataset explorer</span>
+        <span class="endpoint-note">Dataset explorer</span>
       </div>
     </div>
   </div>
 
   <!-- Limitations -->
-  <div class="card-block">
-    <div class="block-title"><i class="fa fa-triangle-exclamation"></i> Limitations &amp; Caveats</div>
+  <div class="section-card">
+    <div class="section-label">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      Limitations &amp; Caveats
+    </div>
     <ul class="limit-list">
       <li>
-        <span class="limit-icon"><i class="fa fa-exclamation"></i></span>
+        <span class="warn-dot"><i class="fa-solid fa-exclamation"></i></span>
         The model is not 100% accurate. Always verify suspicious messages manually before taking action.
       </li>
       <li>
-        <span class="limit-icon"><i class="fa fa-exclamation"></i></span>
+        <span class="warn-dot"><i class="fa-solid fa-exclamation"></i></span>
         Trained primarily on English-language SMS — performance on other languages may be reduced.
       </li>
       <li>
-        <span class="limit-icon"><i class="fa fa-exclamation"></i></span>
+        <span class="warn-dot"><i class="fa-solid fa-exclamation"></i></span>
         Novel smishing techniques not present in the training data may evade detection (zero-day attacks).
       </li>
       <li>
-        <span class="limit-icon"><i class="fa fa-exclamation"></i></span>
+        <span class="warn-dot"><i class="fa-solid fa-exclamation"></i></span>
         Dataset class imbalance (~81% ham) may bias the model toward classifying borderline messages as legitimate.
       </li>
       <li>
-        <span class="limit-icon"><i class="fa fa-exclamation"></i></span>
+        <span class="warn-dot"><i class="fa-solid fa-exclamation"></i></span>
         This tool is for educational and demonstration purposes only — not a substitute for professional security tooling.
       </li>
     </ul>
@@ -616,23 +265,16 @@
 
   <!-- CTA -->
   <div class="cta-block">
-    <div class="cta-title">Try the Detector</div>
-    <div class="cta-sub">Paste any suspicious SMS and let the model analyze it in real time.</div>
-    <a href="/" class="btn-cta"><i class="fa fa-shield-halved"></i> Launch Detector</a>
+    <div class="cta-eyebrow">Ready to test it?</div>
+    <div class="cta-title">
+      <span class="word-green">Try</span> the<br>Detector
+    </div>
+    <p class="cta-sub">Paste any suspicious SMS and let the model analyze it in real time.</p>
+    <a href="/" class="cta-btn">
+      <i class="fa-solid fa-shield-halved"></i>
+      Launch Detector
+    </a>
   </div>
 
-</div>
-
-<!-- ── Footer ── -->
-<footer>
-  <span>© 2025 SmishGuard — NLP-Based Smishing Detection System</span>
-  <div class="footer-links">
-    <a href="/">Detector</a>
-    <a href="/model">Model</a>
-    <a href="/dataset">Dataset</a>
-  </div>
-</footer>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</div><!-- /content-wrap -->
+{% endblock %}

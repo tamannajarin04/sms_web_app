@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}SmishGuard AI{% endblock %}</title>
+
+  <!-- Libs -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Mono:wght@400;500&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ════════════════════════════════════════
+       DESIGN TOKENS
+    ════════════════════════════════════════ */
+    :root {
+      --bg:            #f7f7f5;
+      --surface:       #ffffff;
+      --surface-2:     #f0f0ec;
+      --surface-3:     #e8e8e4;
+      --border:        #e2e2da;
+      --border-strong: #ccccC4;
+      --accent:        #0f9f5c;
+      --accent-hover:  #0d8a4f;
+      --accent-light:  #e6f7ef;
+      --accent-mid:    #34c47a;
+      --danger:        #c93030;
+      --danger-bg:     #fff2f2;
+      --danger-border: #f5c0c0;
+      --warn:          #b06000;
+      --warn-bg:       #fff8e6;
+      --warn-border:   #f5d490;
+      --safe-bg:       #e6f7ef;
+      --safe-border:   #9de0bc;
+      --text:          #111111;
+      --text-2:        #333333;
+      --text-muted:    #666666;
+      --text-faint:    #aaaaaa;
+      --mono:          'Roboto Mono', monospace;
+      --sans:          'Roboto', sans-serif;
+      --display:       'Roboto Condensed', sans-serif;
+      --radius:        14px;
+      --radius-sm:     8px;
+      --shadow-sm:     0 1px 4px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
+      --shadow-md:     0 4px 24px rgba(0,0,0,.08), 0 1px 6px rgba(0,0,0,.05);
+      --nav-h:         64px;
+    }
+    [data-theme="dark"] {
+      --bg:            #0e0e0e;
+      --surface:       #181818;
+      --surface-2:     #202020;
+      --surface-3:     #2a2a2a;
+      --border:        #2e2e2e;
+      --border-strong: #3a3a3a;
+      --accent:        #22c870;
+      --accent-hover:  #1eb362;
+      --accent-light:  #0c2a1a;
+      --accent-mid:    #22c870;
+      --danger:        #f05555;
+      --danger-bg:     #1e0808;
+      --danger-border: #4a1a1a;
+      --warn:          #e8a030;
+      --warn-bg:       #241800;
+      --warn-border:   #7a4a00;
+      --safe-bg:       #0c2a1a;
+      --safe-border:   #1a5c38;
+      --text:          #f0f0ec;
+      --text-2:        #cccccc;
+      --text-muted:    #888888;
+      --text-faint:    #4a4a4a;
+      --shadow-sm:     0 1px 4px rgba(0,0,0,.3), 0 2px 8px rgba(0,0,0,.2);
+      --shadow-md:     0 4px 24px rgba(0,0,0,.4), 0 1px 6px rgba(0,0,0,.25);
+    }
+
+    /* ════════════════════════════════════════
+       RESET & BASE
+    ════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      transition: background .3s, color .3s;
+    }
+
+    /* ════════════════════════════════════════
+       NAVBAR
+    ════════════════════════════════════════ */
+    .navbar {
+      position: sticky; top: 0; z-index: 100;
+      height: var(--nav-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: background .3s, border-color .3s;
+      flex-shrink: 0;
+    }
+    [data-theme="dark"] .navbar { background: rgba(24,24,24,.92); }
+
+    .navbar-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 100%; max-width: 1000px; margin: 0 auto;
+    }
+
+    .brand {
+      display: flex; align-items: center; gap: .7rem;
+      text-decoration: none; color: var(--text);
+    }
+    .brand-icon {
+      width: 36px; height: 36px;
+      background: var(--accent); border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: .85rem;
+      box-shadow: 0 2px 10px rgba(15,159,92,.35);
+      flex-shrink: 0;
+    }
+    .brand-name { font-size: 1.05rem; font-weight: 700; letter-spacing: -.01em; }
+    .brand-name .highlight { color: var(--accent); }
+
+    .nav-links { display: flex; align-items: center; gap: .15rem; list-style: none; }
+    .nav-links a {
+      font-size: .85rem; font-weight: 500; color: var(--text-muted);
+      text-decoration: none; padding: .45rem 1rem; border-radius: var(--radius-sm);
+      transition: color .18s, background .18s;
+    }
+    .nav-links a:hover { color: var(--text); background: var(--surface-2); }
+    .nav-links a.active { color: var(--accent); background: var(--accent-light); }
+
+    .nav-right { display: flex; align-items: center; gap: .75rem; }
+
+    .theme-btn {
+      width: 36px; height: 36px;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted); font-size: .9rem;
+      transition: background .2s, color .2s;
+    }
+    .theme-btn:hover { background: var(--surface-3); color: var(--text); }
+
+    /* ════════════════════════════════════════
+       MAIN CONTENT AREA
+    ════════════════════════════════════════ */
+    .site-main { flex: 1; }
+
+    /* ════════════════════════════════════════
+       SHARED LAYOUT HELPERS
+    ════════════════════════════════════════ */
+
+    /* Page header */
+    .page-header {
+      max-width: 1000px; margin: 0 auto;
+      padding: 4rem 2rem 2.5rem; text-align: center;
+    }
+    .page-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-family: var(--mono); font-size: .7rem; font-weight: 500;
+      color: var(--accent); background: var(--accent-light);
+      border: 1px solid var(--safe-border); border-radius: 100px;
+      padding: .3rem 1rem; margin-bottom: 1.5rem;
+      letter-spacing: .08em; text-transform: uppercase;
+    }
+    .page-header h1 {
+      font-family: var(--display);
+      font-size: clamp(2.8rem, 5vw, 4.2rem);
+      font-weight: 900; letter-spacing: -.01em; line-height: .95;
+      margin-bottom: 1rem; text-transform: uppercase; color: var(--text);
+    }
+    .page-header h1 .word-green { color: var(--accent); }
+    .page-header h1 .word-ghost {
+      color: transparent; -webkit-text-stroke: 2px var(--border-strong);
+    }
+    .page-header p {
+      font-size: .98rem; color: var(--text-muted); line-height: 1.75;
+      max-width: 520px; margin: 0 auto;
+    }
+
+    /* Content wrapper */
+    .content-wrap { max-width: 1000px; margin: 0 auto 5rem; padding: 0 2rem; }
+
+    /* Section card */
+    .section-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 2rem 2.2rem;
+      margin-bottom: 1.25rem; box-shadow: var(--shadow-sm);
+      position: relative; overflow: hidden;
+      transition: background .3s, border-color .3s;
+    }
+    .section-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--accent); opacity: 0; transition: opacity .2s;
+    }
+    .section-card:hover::before { opacity: 1; }
+
+    /* Section label */
+    .section-label {
+      display: flex; align-items: center; gap: .6rem;
+      font-family: var(--mono); font-size: .68rem; font-weight: 500;
+      color: var(--accent); text-transform: uppercase; letter-spacing: .12em;
+      margin-bottom: 1.5rem;
+    }
+    .section-label i { font-size: .6rem; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* Body text */
+    .body-text {
+      font-size: .9rem; color: var(--text-muted); line-height: 1.8; margin-bottom: .9rem;
+    }
+    .body-text:last-child { margin-bottom: 0; }
+    .body-text strong { color: var(--text-2); font-weight: 600; }
+
+    /* Code / pre */
+    pre {
+      font-family: var(--mono); font-size: .78rem; line-height: 1.9; color: var(--text-2);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: .9rem 1.1rem; overflow-x: auto; margin: 0;
+    }
+    .kw  { color: #9c5df5; }
+    .str { color: var(--accent); }
+    .key { color: #2979d8; }
+    .cm  { color: var(--text-faint); font-style: italic; }
+
+    /* CTA block */
+    .cta-block {
+      background: var(--accent-light);
+      border: 1.5px solid var(--safe-border);
+      border-radius: var(--radius);
+      padding: 3.5rem 2rem;
+      text-align: center;
+      margin-top: 1.25rem;
+      position: relative; overflow: hidden;
+    }
+    .cta-block::after {
+      content: ''; position: absolute;
+      bottom: -80px; right: -80px;
+      width: 220px; height: 220px;
+      background: radial-gradient(circle, rgba(15,159,92,.12), transparent 70%);
+      pointer-events: none;
+    }
+    .cta-eyebrow {
+      font-family: var(--mono); font-size: .68rem; font-weight: 500;
+      color: var(--accent); text-transform: uppercase; letter-spacing: .12em;
+      margin-bottom: .75rem;
+    }
+    .cta-title {
+      font-family: var(--display);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 900; text-transform: uppercase;
+      color: var(--text); line-height: .95;
+      margin-bottom: 1rem; letter-spacing: -.01em;
+    }
+    .cta-title .word-green { color: var(--accent); }
+    .cta-sub {
+      font-size: .92rem; color: var(--text-muted); line-height: 1.65;
+      margin-bottom: 2rem; max-width: 360px; margin-left: auto; margin-right: auto;
+    }
+    .cta-btn {
+      display: inline-flex; align-items: center; gap: .55rem;
+      background: var(--accent); color: #fff; border: none;
+      border-radius: var(--radius-sm); padding: .9rem 2.2rem;
+      font-family: var(--sans); font-size: .95rem; font-weight: 600;
+      text-decoration: none;
+      transition: background .18s, transform .1s, box-shadow .2s;
+      box-shadow: 0 2px 14px rgba(15,159,92,.35);
+      letter-spacing: .01em;
+    }
+    .cta-btn:hover {
+      background: var(--accent-hover); color: #fff;
+      transform: translateY(-2px); box-shadow: 0 6px 22px rgba(15,159,92,.45);
+    }
+
+    /* Shared buttons */
+    .btn-primary-sg {
+      display: inline-flex; align-items: center; gap: .55rem;
+      background: var(--accent); color: #fff; border: none;
+      border-radius: var(--radius-sm); padding: .9rem 2rem;
+      font-family: var(--sans); font-size: .92rem; font-weight: 600;
+      text-decoration: none;
+      transition: background .18s, transform .12s, box-shadow .2s;
+      box-shadow: 0 2px 14px rgba(15,159,92,.35);
+      letter-spacing: .01em;
+    }
+    .btn-primary-sg:hover {
+      background: var(--accent-hover); color: #fff;
+      transform: translateY(-2px); box-shadow: 0 6px 22px rgba(15,159,92,.45);
+    }
+    .btn-ghost-sg {
+      display: inline-flex; align-items: center; gap: .55rem;
+      background: transparent; color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: .88rem 1.6rem;
+      font-family: var(--sans); font-size: .92rem; font-weight: 500;
+      text-decoration: none;
+      transition: background .18s, color .18s, border-color .18s, transform .12s;
+      letter-spacing: .01em;
+    }
+    .btn-ghost-sg:hover {
+      background: var(--surface-2); color: var(--text);
+      border-color: var(--border-strong); transform: translateY(-2px);
+    }
+
+    /* ════════════════════════════════════════
+       FOOTER
+    ════════════════════════════════════════ */
+    footer {
+      background: var(--surface); border-top: 1px solid var(--border);
+      padding: 1.25rem 2rem; flex-shrink: 0;
+      transition: background .3s, border-color .3s;
+    }
+    .footer-inner {
+      max-width: 1000px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: .5rem;
+    }
+    footer p { font-size: .75rem; color: var(--text-faint); }
+    .footer-nav { display: flex; gap: 1.5rem; }
+    .footer-nav a {
+      font-size: .75rem; color: var(--text-muted);
+      text-decoration: none; transition: color .15s;
+    }
+    .footer-nav a:hover { color: var(--accent); }
+
+    /* ════════════════════════════════════════
+       RESPONSIVE
+    ════════════════════════════════════════ */
+    @media (max-width: 860px) {
+      .navbar { padding: 0 1.25rem; }
+      .nav-links { display: none; }
+      .page-header { padding: 3rem 1.25rem 2rem; }
+      .content-wrap { padding: 0 1.25rem; }
+      .section-card { padding: 1.5rem 1.25rem; }
+      footer { padding: 1rem 1.25rem; }
+    }
+  </style>
+
+  <!-- Per-page extra styles -->
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+
+<!-- ══ Navbar ══════════════════════════════════════════════ -->
+<nav class="navbar">
+  <div class="navbar-inner">
+
+    <a class="brand" href="/">
+      <div class="brand-icon"><i class="fa-solid fa-shield-halved"></i></div>
+      <span class="brand-name">SmishGuard <span class="highlight">AI</span></span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="/"        {% if active_page == 'home'    %}class="active"{% endif %}>Home</a></li>
+      <li><a href="/model"   {% if active_page == 'model'   %}class="active"{% endif %}>Model</a></li>
+      <li><a href="/dataset" {% if active_page == 'dataset' %}class="active"{% endif %}>Dataset</a></li>
+      <li><a href="/about"   {% if active_page == 'about'   %}class="active"{% endif %}>About</a></li>
+    </ul>
+
+    <div class="nav-right">
+      <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">
+        <i class="fa-solid fa-moon" id="themeIcon"></i>
+      </button>
+    </div>
+
+  </div>
+</nav>
+
+<!-- ══ Page Content ════════════════════════════════════════ -->
+<main class="site-main">
+  {% block content %}{% endblock %}
+</main>
+
+<!-- ══ Footer ══════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <p>© 2025 SmishGuard — NLP-Based Smishing Detection System</p>
+    <nav class="footer-nav">
+      <a href="/">Detector</a>
+      <a href="/model">Model</a>
+      <a href="/dataset">Dataset</a>
+    </nav>
+  </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+
+<!-- Theme toggle — shared across all pages -->
+<script>
+  const html      = document.documentElement;
+  const themeBtn  = document.getElementById('themeBtn');
+  const themeIcon = document.getElementById('themeIcon');
+
+  // Restore saved preference immediately (no flash)
+  const saved = localStorage.getItem('sg-theme');
+  if (saved) { html.setAttribute('data-theme', saved); updateIcon(saved); }
+
+  themeBtn.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('sg-theme', next);
+    updateIcon(next);
+  });
+
+  function updateIcon(t) {
+    themeIcon.className = t === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+  }
+</script>
+
+<!-- Per-page extra scripts -->
+{% block scripts %}{% endblock %}
+
+</body>
+</html>

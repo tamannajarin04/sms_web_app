@@ -1,558 +1,525 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SmishGuard — SMS Threat Detector</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet"/>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <style>
-    :root {
-      --bg:          #f7f8fc;
-      --surface:     #ffffff;
-      --surface-2:   #f0f2f8;
-      --border:      #e2e6f0;
-      --border-dark: #c8cfdf;
-      --accent:      #2563eb;
-      --accent-dim:  #3b82f6;
-      --accent-bg:   #eff5ff;
-      --danger:      #dc2626;
-      --danger-bg:   #fef2f2;
-      --danger-border: #fecaca;
-      --safe:        #16a34a;
-      --safe-bg:     #f0fdf4;
-      --safe-border: #bbf7d0;
-      --text:        #0f172a;
-      --text-2:      #334155;
-      --text-muted:  #64748b;
-      --text-faint:  #94a3b8;
-      --mono:        'DM Mono', monospace;
-      --sans:        'Sora', sans-serif;
-      --radius:      12px;
-      --shadow-sm:   0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04);
-      --shadow:      0 4px 16px rgba(15,23,42,.08), 0 1px 4px rgba(15,23,42,.04);
-      --shadow-lg:   0 12px 40px rgba(15,23,42,.1), 0 2px 8px rgba(15,23,42,.05);
-    }
+{% extends "base.html" %}
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+{% block title %}SmishGuard AI — SMS Threat Detector{% endblock %}
 
-    body {
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
 
-    /* Subtle dot grid */
-    body::before {
-      content: '';
-      position: fixed; inset: 0; z-index: 0;
-      background-image: radial-gradient(circle, #d1d5e8 1px, transparent 1px);
-      background-size: 28px 28px;
-      opacity: .45;
-      pointer-events: none;
-    }
+{# ═══════════════════════════════════════════
+   PAGE-SPECIFIC STYLES
+═══════════════════════════════════════════ #}
+{% block head_extra %}
+<style>
 
-    /* ── Navbar ── */
-    .navbar {
-      background: rgba(255,255,255,.88);
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      padding: 0 2.5rem;
-      height: 64px;
-      position: sticky; top: 0; z-index: 100;
-      box-shadow: var(--shadow-sm);
-    }
-    .navbar-brand {
-      font-family: var(--sans);
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--text) !important;
-      display: flex; align-items: center; gap: .65rem;
-      letter-spacing: -.02em;
-    }
-    .brand-logo {
-      width: 34px; height: 34px;
-      background: var(--accent);
-      border-radius: 9px;
-      display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: .9rem;
-      box-shadow: 0 2px 8px rgba(37,99,235,.35);
-    }
-    .brand-logo i { line-height: 1; }
-    .brand-tag {
-      font-size: .62rem;
-      font-weight: 500;
-      font-family: var(--mono);
-      color: var(--accent);
-      background: var(--accent-bg);
-      border: 1px solid #bfdbfe;
-      border-radius: 4px;
-      padding: .1rem .4rem;
-      letter-spacing: .04em;
-      margin-left: .1rem;
-      align-self: center;
-    }
-    .nav-link {
-      font-size: .82rem;
-      font-weight: 500;
-      color: var(--text-muted) !important;
-      padding: .4rem .85rem !important;
-      border-radius: 7px;
-      transition: color .18s, background .18s;
-    }
-    .nav-link:hover, .nav-link.active {
-      color: var(--accent) !important;
-      background: var(--accent-bg);
-    }
+  /* Index uses a wider max-width than base */
+  .hero-wrapper,
+  .stats-section,
+  .navbar-inner,
+  .footer-inner { max-width: 1200px; }
 
-    /* ── Hero ── */
-    .hero {
-      position: relative; z-index: 1;
-      padding: 5rem 1.5rem 2.5rem;
-      text-align: center;
-    }
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: .5rem;
-      font-family: var(--mono);
-      font-size: .7rem;
-      font-weight: 400;
-      color: var(--accent);
-      background: var(--accent-bg);
-      border: 1px solid #bfdbfe;
-      border-radius: 100px;
-      padding: .3rem 1rem;
-      margin-bottom: 1.8rem;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-    }
-    .hero-badge .pulse {
-      width: 7px; height: 7px;
-      background: #22c55e;
-      border-radius: 50%;
-      animation: pulse-dot 2.2s infinite;
-      box-shadow: 0 0 0 0 rgba(34,197,94,.5);
-    }
-    @keyframes pulse-dot {
-      0%   { box-shadow: 0 0 0 0 rgba(34,197,94,.45); }
-      60%  { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
-      100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
-    }
-    .hero h1 {
-      font-size: clamp(2.2rem, 5vw, 3.6rem);
-      font-weight: 800;
-      line-height: 1.12;
-      letter-spacing: -.04em;
-      color: var(--text);
-      margin-bottom: 1rem;
-    }
-    .hero h1 em {
-      font-style: normal;
-      color: var(--accent);
-      position: relative;
-    }
-    .hero h1 em::after {
-      content: '';
-      position: absolute;
-      bottom: 2px; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--accent), #60a5fa);
-      border-radius: 4px;
-      opacity: .4;
-    }
-    .hero p.lead {
-      font-size: 1.05rem;
-      font-weight: 400;
-      color: var(--text-muted);
-      max-width: 520px;
-      margin: 0 auto;
-      line-height: 1.75;
-    }
+  /* ── Nav CTA ── */
+  .btn-nav-cta {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: .5rem 1.2rem;
+    font-family: var(--sans);
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .18s, transform .1s, box-shadow .2s;
+    box-shadow: 0 2px 10px rgba(15,159,92,.3);
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: .4rem;
+    letter-spacing: .01em;
+  }
+  .btn-nav-cta:hover {
+    background: var(--accent-hover); color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 18px rgba(15,159,92,.4);
+  }
 
-    /* ── Main card ── */
-    .main-card {
-      position: relative; z-index: 1;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 2.4rem 2.4rem 2rem;
-      max-width: 740px;
-      margin: 2.2rem auto 2rem;
-      box-shadow: var(--shadow-lg);
-    }
+  /* ── Hero Layout ── */
+  .hero-wrapper {
+    margin: 0 auto;
+    padding: 3.5rem 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    min-height: calc(100vh - var(--nav-h) - 180px);
+    align-items: center;
+  }
 
-    .field-label {
-      display: flex; align-items: center; gap: .5rem;
-      font-size: .72rem;
-      font-weight: 600;
-      font-family: var(--mono);
-      color: var(--text-muted);
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      margin-bottom: .6rem;
-    }
-    .field-label i { font-size: .65rem; color: var(--text-faint); }
+  /* ── Hero Left ── */
+  .hero-left { display: flex; flex-direction: column; }
 
-    /* ── Textarea ── */
-    .sms-textarea {
-      width: 100%;
-      background: var(--surface-2);
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      color: var(--text);
-      font-family: var(--mono);
-      font-size: .875rem;
-      padding: 1rem 1.2rem;
-      resize: vertical;
-      min-height: 140px;
-      line-height: 1.75;
-      transition: border-color .22s, box-shadow .22s, background .2s;
-      outline: none;
-    }
-    .sms-textarea:focus {
-      border-color: var(--accent);
-      background: #fff;
-      box-shadow: 0 0 0 3px rgba(37,99,235,.1);
-    }
-    .sms-textarea::placeholder { color: var(--text-faint); }
+  .badge-live {
+    display: inline-flex; align-items: center; gap: .5rem;
+    font-family: var(--mono);
+    font-size: .7rem; font-weight: 500;
+    color: var(--accent);
+    background: var(--accent-light);
+    border: 1px solid var(--safe-border);
+    border-radius: 100px;
+    padding: .3rem 1rem;
+    margin-bottom: 2rem;
+    width: fit-content;
+    letter-spacing: .08em; text-transform: uppercase;
+  }
+  .live-dot {
+    width: 7px; height: 7px;
+    background: var(--accent); border-radius: 50%;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%,100% { opacity: 1; }
+    50%      { opacity: .35; }
+  }
 
-    .char-counter {
-      font-family: var(--mono);
-      font-size: .7rem;
-      color: var(--text-faint);
-      text-align: right;
-      margin-top: .4rem;
-    }
-    .char-counter.warn { color: #d97706; }
-    .char-counter.over { color: var(--danger); }
+  .hero-headline {
+    font-family: var(--display);
+    font-size: clamp(3.8rem, 7vw, 6.5rem);
+    font-weight: 900;
+    line-height: .93;
+    letter-spacing: -.01em;
+    margin-bottom: 1.5rem;
+    color: var(--text);
+    text-transform: uppercase;
+  }
+  .hero-headline .word-green { color: var(--accent); }
+  .hero-headline .word-ghost {
+    color: transparent;
+    -webkit-text-stroke: 2px var(--border-strong);
+  }
 
-    /* ── Example pills ── */
-    .examples-wrap { display: flex; flex-wrap: wrap; gap: .45rem; margin: 1.1rem 0 1.6rem; }
-    .example-pill {
-      font-family: var(--mono);
-      font-size: .68rem;
-      border: 1.5px solid var(--border);
-      border-radius: 100px;
-      padding: .28rem .85rem;
-      color: var(--text-muted);
-      background: var(--surface);
-      cursor: pointer;
-      transition: border-color .18s, color .18s, background .18s, box-shadow .18s;
-      white-space: nowrap;
-    }
-    .example-pill:hover {
-      border-color: var(--accent-dim);
-      color: var(--accent);
-      background: var(--accent-bg);
-      box-shadow: 0 0 0 3px rgba(37,99,235,.06);
-    }
+  .threat-chips {
+    display: flex; align-items: center; gap: .5rem;
+    flex-wrap: wrap; margin-bottom: 2.5rem;
+  }
+  .chip {
+    font-size: .75rem; font-weight: 500;
+    padding: .3rem .85rem; border-radius: 100px;
+    display: inline-flex; align-items: center; gap: .4rem;
+    letter-spacing: .02em;
+  }
+  .chip-red   { background: #fff2f2; color: #c93030; border: 1px solid #f5c0c0; }
+  .chip-amber { background: #fff8e6; color: #9a5e00; border: 1px solid #f5d490; }
+  .chip-green { background: var(--accent-light); color: var(--accent); border: 1px solid var(--safe-border); }
+  [data-theme="dark"] .chip-red   { background: #2a0a0a; color: #f08080; border-color: #5a1c1c; }
+  [data-theme="dark"] .chip-amber { background: #241800; color: #e8a030; border-color: #7a4a00; }
 
-    /* ── Divider ── */
-    .divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 1.6rem 0;
-    }
+  .hero-tagline {
+    font-size: 1.05rem; font-weight: 400;
+    color: var(--text-muted); line-height: 1.75;
+    max-width: 420px; margin-bottom: 2rem;
+  }
+  .hero-tagline strong { color: var(--text-2); font-weight: 500; }
 
-    /* ── Scan button ── */
-    .btn-scan {
-      width: 100%;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: .9rem;
-      font-family: var(--sans);
-      font-size: .9rem;
-      font-weight: 600;
-      letter-spacing: -.01em;
-      cursor: pointer;
-      transition: background .18s, box-shadow .2s, transform .12s;
-      display: flex; align-items: center; justify-content: center; gap: .55rem;
-      box-shadow: 0 2px 12px rgba(37,99,235,.3), 0 1px 3px rgba(37,99,235,.2);
-    }
-    .btn-scan:hover {
-      background: #1d4ed8;
-      box-shadow: 0 4px 20px rgba(37,99,235,.38), 0 1px 4px rgba(37,99,235,.2);
-    }
-    .btn-scan:active { transform: scale(.99); }
-    .btn-scan:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+  .hero-btns {
+    display: flex; align-items: center; gap: .85rem; flex-wrap: wrap;
+  }
+  .btn-primary {
+    background: var(--accent); color: #fff; border: none;
+    border-radius: var(--radius-sm); padding: .8rem 1.75rem;
+    font-family: var(--sans); font-size: .95rem; font-weight: 600;
+    cursor: pointer; text-decoration: none; letter-spacing: .01em;
+    display: inline-flex; align-items: center; gap: .5rem;
+    transition: background .18s, transform .1s, box-shadow .2s;
+    box-shadow: 0 2px 14px rgba(15,159,92,.35);
+  }
+  .btn-primary:hover {
+    background: var(--accent-hover); color: #fff;
+    transform: translateY(-2px); box-shadow: 0 6px 22px rgba(15,159,92,.45);
+  }
+  .btn-outline {
+    background: transparent; color: var(--text-muted);
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-sm); padding: .8rem 1.75rem;
+    font-family: var(--sans); font-size: .95rem; font-weight: 500;
+    cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; gap: .5rem;
+    transition: border-color .18s, color .18s, background .18s;
+  }
+  .btn-outline:hover {
+    border-color: var(--text-muted); color: var(--text);
+    background: var(--surface-2);
+  }
 
-    /* ── Result panel ── */
-    .result-panel {
-      margin-top: 1.6rem;
-      border-radius: 12px;
-      border: 1.5px solid var(--border);
-      overflow: hidden;
-      display: none;
-    }
-    .result-panel.show {
-      display: block;
-      animation: fadeUp .32s cubic-bezier(.22,.61,.36,1);
-    }
-    @keyframes fadeUp {
-      from { opacity:0; transform: translateY(8px); }
-      to   { opacity:1; transform: translateY(0); }
-    }
-    .result-panel.threat { border-color: var(--danger-border); }
-    .result-panel.safe   { border-color: var(--safe-border); }
+  /* ── App Card ── */
+  .hero-right { display: flex; align-items: center; justify-content: center; }
 
-    .result-header {
-      padding: 1.2rem 1.5rem;
-      display: flex; align-items: center; gap: 1.1rem;
-      border-bottom: 1px solid transparent;
-    }
-    .result-panel.threat .result-header {
-      background: var(--danger-bg);
-      border-bottom-color: var(--danger-border);
-    }
-    .result-panel.safe .result-header {
-      background: var(--safe-bg);
-      border-bottom-color: var(--safe-border);
-    }
+  .app-card {
+    width: 100%; max-width: 460px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
 
-    .result-icon {
-      width: 46px; height: 46px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.25rem;
-      flex-shrink: 0;
-    }
-    .result-panel.threat .result-icon { background: #fee2e2; color: var(--danger); }
-    .result-panel.safe   .result-icon { background: #dcfce7; color: var(--safe); }
+  .card-titlebar {
+    display: flex; align-items: center; gap: .5rem;
+    padding: .9rem 1.25rem;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .mac-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .mac-dot.r { background: #ff5f57; }
+  .mac-dot.y { background: #febc2e; }
+  .mac-dot.g { background: #28c840; }
+  .card-win-label {
+    font-family: var(--mono); font-size: .65rem;
+    color: var(--text-faint); letter-spacing: .12em;
+    text-transform: uppercase; margin-left: .5rem;
+  }
 
-    .result-title {
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: -.02em;
-    }
-    .result-panel.threat .result-title { color: var(--danger); }
-    .result-panel.safe   .result-title { color: var(--safe); }
-    .result-sub { font-size: .8rem; color: var(--text-muted); margin-top: .2rem; }
+  .card-body { padding: 1.4rem 1.4rem 1.2rem; }
 
-    .result-body { padding: 1.1rem 1.5rem 1.3rem; background: #fff; }
-    .result-tip { font-size: .85rem; color: var(--text-2); line-height: 1.7; }
-    .result-tip strong { font-weight: 600; }
+  .sms-textarea {
+    width: 100%;
+    background: var(--surface-2); border: 1.5px solid var(--border);
+    border-radius: 10px; color: var(--text);
+    font-family: var(--mono); font-size: .82rem; line-height: 1.8;
+    padding: .9rem 1.1rem; resize: vertical; min-height: 115px;
+    outline: none;
+    transition: border-color .2s, background .2s, box-shadow .2s;
+  }
+  .sms-textarea:focus {
+    border-color: var(--accent); background: var(--surface);
+    box-shadow: 0 0 0 3px rgba(15,159,92,.12);
+  }
+  .sms-textarea::placeholder { color: var(--text-faint); }
 
-    /* ── Stats strip ── */
-    .stats-strip {
-      position: relative; z-index: 1;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-      max-width: 740px;
-      margin: 0 auto 5rem;
-    }
-    .stat-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1.3rem 1rem 1.1rem;
-      text-align: center;
-      box-shadow: var(--shadow-sm);
-      transition: box-shadow .2s, transform .2s;
-    }
-    .stat-box:hover {
-      box-shadow: var(--shadow);
-      transform: translateY(-2px);
-    }
-    .stat-num {
-      font-family: var(--mono);
-      font-size: 1.5rem;
-      font-weight: 500;
-      color: var(--accent);
-      letter-spacing: -.02em;
-    }
-    .stat-lbl {
-      font-size: .68rem;
-      font-weight: 600;
-      color: var(--text-faint);
-      margin-top: .3rem;
-      text-transform: uppercase;
-      letter-spacing: .09em;
-    }
+  .row-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: .6rem;
+  }
+  .char-count-label { font-family: var(--mono); font-size: .68rem; color: var(--text-faint); }
 
-    /* ── Spinner ── */
-    .spinner {
-      display: inline-block;
-      width: 15px; height: 15px;
-      border: 2px solid rgba(255,255,255,.35);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin .65s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+  .inline-send {
+    background: var(--accent); color: #fff; border: none;
+    border-radius: 8px; width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: .85rem;
+    box-shadow: 0 2px 8px rgba(15,159,92,.35);
+    transition: background .18s, transform .1s;
+  }
+  .inline-send:hover { background: var(--accent-hover); transform: translateY(-1px); }
+  .inline-send:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 
-    /* ── Footer ── */
-    footer {
-      position: relative; z-index: 1;
-      border-top: 1px solid var(--border);
-      padding: 1.5rem 2.5rem;
-      font-size: .75rem;
-      font-weight: 500;
-      color: var(--text-faint);
-      display: flex; justify-content: space-between; align-items: center;
-      flex-wrap: wrap; gap: .5rem;
-      background: var(--surface);
-    }
-    footer a { color: var(--text-muted); text-decoration: none; transition: color .15s; }
-    footer a:hover { color: var(--accent); }
-    .footer-links { display: flex; gap: 1.5rem; }
-    .footer-right { display: flex; align-items: center; gap: .5rem; }
-    .footer-dot { color: var(--border-dark); }
+  .examples-row { display: flex; gap: .45rem; flex-wrap: wrap; margin-top: 1rem; }
+  .ex-tag {
+    font-family: var(--mono); font-size: .64rem;
+    border: 1.5px solid var(--border); border-radius: 100px;
+    padding: .22rem .75rem; color: var(--text-muted);
+    background: transparent; cursor: pointer; white-space: nowrap;
+    transition: border-color .18s, color .18s, background .18s;
+  }
+  .ex-tag:hover {
+    border-color: var(--accent); color: var(--accent);
+    background: var(--accent-light);
+  }
 
-    @media (max-width: 640px) {
-      .navbar { padding: 0 1.2rem; }
-      .main-card { margin: 1rem; padding: 1.5rem 1.2rem; }
-      .stats-strip { grid-template-columns: repeat(2, 1fr); margin: 0 1rem 4rem; }
-      .hero { padding: 3rem 1rem 2rem; }
-      footer { padding: 1.2rem; flex-direction: column; align-items: flex-start; }
-      .footer-links { gap: 1rem; }
-    }
-  </style>
-</head>
-<body>
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.1rem 0; }
 
-<!-- ── Navbar ── -->
-<nav class="navbar navbar-expand-lg">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="/">
-      <div class="brand-logo"><i class="fa fa-shield-halved"></i></div>
-      SmishGuard
-      <span class="brand-tag">v2.0</span>
-    </a>
-    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-      <i class="fa fa-bars" style="color:var(--text-muted)"></i>
-    </button>
-    <div class="collapse navbar-collapse" id="navMenu">
-      <ul class="navbar-nav ms-auto gap-1 align-items-center">
-        <li class="nav-item"><a class="nav-link active" href="/">Detect</a></li>
-        <li class="nav-item"><a class="nav-link" href="/model">Model</a></li>
-        <li class="nav-item"><a class="nav-link" href="/dataset">Dataset</a></li>
-        <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
-      </ul>
+  .analyze-btn {
+    width: 100%; background: var(--accent); color: #fff; border: none;
+    border-radius: 9px; padding: .8rem 1rem;
+    font-family: var(--sans); font-size: .9rem; font-weight: 600;
+    cursor: pointer; letter-spacing: .01em;
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
+    transition: background .18s, transform .1s, box-shadow .2s;
+    box-shadow: 0 2px 12px rgba(15,159,92,.3);
+  }
+  .analyze-btn:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 5px 18px rgba(15,159,92,.4); }
+  .analyze-btn:active { transform: scale(.99); }
+  .analyze-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+  /* ── Result Box ── */
+  .result-box {
+    margin-top: 1rem; border-radius: 10px;
+    border: 1.5px solid var(--border);
+    overflow: hidden; display: none;
+  }
+  .result-box.show { display: block; animation: slideUp .3s cubic-bezier(.22,.61,.36,1); }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .result-box.is-threat { border-color: var(--danger-border); }
+  .result-box.is-safe   { border-color: var(--safe-border); }
+
+  .result-head {
+    padding: 1rem 1.2rem;
+    display: flex; align-items: center; gap: .9rem;
+    border-bottom: 1px solid transparent;
+  }
+  .result-box.is-threat .result-head { background: var(--danger-bg);  border-bottom-color: var(--danger-border); }
+  .result-box.is-safe   .result-head { background: var(--safe-bg);    border-bottom-color: var(--safe-border); }
+
+  .result-icon-wrap {
+    width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+  }
+  .result-box.is-threat .result-icon-wrap { background: #fde2e2; color: var(--danger); }
+  .result-box.is-safe   .result-icon-wrap { background: #d4f7e6; color: var(--accent); }
+
+  .result-label { font-size: .9rem; font-weight: 700; }
+  .result-box.is-threat .result-label { color: var(--danger); }
+  .result-box.is-safe   .result-label { color: var(--accent); }
+  .result-desc  { font-size: .73rem; color: var(--text-muted); margin-top: .1rem; }
+  .result-content { padding: .9rem 1.2rem; background: var(--surface); }
+  .result-tip { font-size: .8rem; color: var(--text-2); line-height: 1.7; }
+
+  /* ── Spinner ── */
+  .spinner {
+    display: inline-block; width: 14px; height: 14px;
+    border: 2.5px solid rgba(255,255,255,.3);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin .55s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Stats ── */
+  .stats-section {
+    margin: 0 auto;
+    padding: 0 2rem 4.5rem;
+  }
+  .stats-divider { height: 1px; background: var(--border); margin-bottom: 2.5rem; }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+  .stat-tile {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.5rem 1.3rem;
+    position: relative; overflow: hidden;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .stat-tile::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--accent); opacity: 0; transition: opacity .2s;
+  }
+  .stat-tile:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+  .stat-tile:hover::before { opacity: 1; }
+  .stat-number {
+    font-family: var(--display); font-size: 2.6rem; font-weight: 900;
+    color: var(--accent); line-height: 1; letter-spacing: -.01em;
+  }
+  .stat-name {
+    font-size: .72rem; font-weight: 600; color: var(--text-faint);
+    margin-top: .5rem; text-transform: uppercase; letter-spacing: .1em;
+  }
+  .stat-desc { font-size: .8rem; color: var(--text-muted); margin-top: .3rem; }
+
+  /* ── Responsive ── */
+  @media (max-width: 860px) {
+    .hero-wrapper { grid-template-columns: 1fr; padding: 2rem 1.25rem; gap: 2rem; }
+    .hero-headline { font-size: clamp(3rem, 13vw, 4.5rem); }
+    .stats-section { padding: 0 1.25rem 3rem; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+{% endblock %}
+
+
+{# ═══════════════════════════════════════════
+   NAVBAR EXTRA  (Get Started CTA button)
+   Injected via JS after DOM load since
+   base.html owns the navbar markup.
+═══════════════════════════════════════════ #}
+
+
+{# ═══════════════════════════════════════════
+   PAGE CONTENT
+═══════════════════════════════════════════ #}
+{% block content %}
+
+<!-- ── Hero ─────────────────────────────────── -->
+<div class="hero-wrapper">
+
+  <!-- Left -->
+  <div class="hero-left">
+
+    <div class="badge-live">
+      <span class="live-dot"></span>
+      Live Detection &middot; V2.4
     </div>
+
+    <h1 class="hero-headline">
+      <span class="word-green">Detect</span><br>
+      SMS<br>
+      <span class="word-ghost">Threats</span>
+    </h1>
+
+    <div class="threat-chips">
+      <span class="chip chip-red">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size:.6rem"></i> Phishing
+      </span>
+      <span class="chip chip-amber">
+        <i class="fa-solid fa-envelope-circle-check" style="font-size:.6rem"></i> Spam
+      </span>
+      <span class="chip chip-green">
+        <i class="fa-solid fa-circle-check" style="font-size:.6rem"></i> Safe
+      </span>
+    </div>
+
+    <p class="hero-tagline">
+      Paste any suspicious text message and our <strong>NLP classifier</strong> identifies
+      phishing, smishing, and spam — in under&nbsp;50&nbsp;ms.
+    </p>
+
+    <div class="hero-btns">
+      <a href="#scanner" class="btn-primary">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        Try the Scanner
+      </a>
+      <a href="/model" class="btn-outline">
+        View Docs <i class="fa-solid fa-arrow-right" style="font-size:.75rem"></i>
+      </a>
+    </div>
+
   </div>
-</nav>
 
-<!-- ── Hero ── -->
-<section class="hero">
-  <div class="hero-badge">
-    <span class="pulse"></span>
-    NLP · SVM · Real-time Detection
-  </div>
-  <h1>Detect <em>Smishing</em> Attacks<br>Before They Strike</h1>
-  <p class="lead">Paste any suspicious SMS below. Our LinearSVC model — trained on 5,971 real messages — classifies threats in milliseconds.</p>
-</section>
+  <!-- Right — App Card -->
+  <div class="hero-right" id="scanner">
+    <div class="app-card">
 
-<!-- ── Main Card ── -->
-<div class="main-card container px-3">
+      <div class="card-titlebar">
+        <span class="mac-dot r"></span>
+        <span class="mac-dot y"></span>
+        <span class="mac-dot g"></span>
+        <span class="card-win-label">SMS Threat Analyser</span>
+      </div>
 
-  <div class="field-label">
-    <i class="fa fa-comment-sms"></i>
-    SMS Message
-  </div>
-  <textarea id="smsInput" class="sms-textarea" maxlength="1600"
-    placeholder="Paste the message here — e.g. &quot;Congratulations! You've won a $1,000 gift card. Claim now: http://bit.ly/xxxxx&quot;"></textarea>
-  <div class="char-counter"><span id="charCount">0</span> / 1600 characters</div>
+      <div class="card-body">
+        <textarea
+          id="smsInput"
+          class="sms-textarea"
+          maxlength="1600"
+          placeholder="Paste an SMS message here…"
+        ></textarea>
 
-  <div class="field-label mt-4">
-    <i class="fa fa-bolt"></i>
-    Quick Examples
-  </div>
-  <div class="examples-wrap">
-    <button class="example-pill" data-text="Hi! Are we still on for dinner tonight at 7?">✓ Legit — Dinner plans</button>
-    <button class="example-pill" data-text="URGENT: Your bank account has been suspended. Verify now: http://bank-secure.xyz/login">⚠ Smishing — Bank alert</button>
-    <button class="example-pill" data-text="Your Amazon package is delayed. Click to reschedule: http://amzn-delivery.biz/track">⚠ Smishing — Delivery</button>
-    <button class="example-pill" data-text="Hey, did you see the match last night? Crazy ending!">✓ Legit — Casual chat</button>
-  </div>
+        <div class="row-meta">
+          <span class="char-count-label">
+            <span id="charCount">0</span> / 1600 chars
+          </span>
+          <button class="inline-send" id="inlineSend"
+                  onclick="analyzeMessage()" title="Analyze (Ctrl+Enter)">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
 
-  <hr class="divider">
+        <div class="examples-row">
+          <button class="ex-tag" data-text="Hi! Are we still on for dinner tonight at 7?">✓ Dinner plans</button>
+          <button class="ex-tag" data-text="URGENT: Your bank account has been suspended. Verify now: http://bank-secure.xyz/login">⚠ Bank alert</button>
+          <button class="ex-tag" data-text="Your Amazon package is delayed. Click to reschedule: http://amzn-delivery.biz/track">⚠ Delivery scam</button>
+          <button class="ex-tag" data-text="Hey, did you see the match last night? Crazy ending!">✓ Casual chat</button>
+        </div>
 
-  <button class="btn-scan" id="scanBtn" onclick="analyzeMessage()">
-    <i class="fa fa-magnifying-glass"></i>
-    Analyze Message
-  </button>
+        <hr class="divider">
 
-  <!-- Result -->
-  <div class="result-panel" id="resultPanel">
-    <div class="result-header">
-      <div class="result-icon" id="resultIcon"></div>
-      <div>
-        <div class="result-title" id="resultTitle"></div>
-        <div class="result-sub" id="resultSub"></div>
+        <button class="analyze-btn" id="analyzeBtn" onclick="analyzeMessage()">
+          <i class="fa-solid fa-shield-halved"></i>
+          Analyze Message
+        </button>
+
+        <div class="result-box" id="resultBox">
+          <div class="result-head">
+            <div class="result-icon-wrap" id="resultIcon"></div>
+            <div>
+              <div class="result-label" id="resultLabel"></div>
+              <div class="result-desc"  id="resultDesc"></div>
+            </div>
+          </div>
+          <div class="result-content">
+            <div class="result-tip" id="resultTip"></div>
+          </div>
+        </div>
+
       </div>
     </div>
-    <div class="result-body">
-      <div class="result-tip" id="resultTip"></div>
+  </div>
+
+</div><!-- /hero-wrapper -->
+
+<!-- ── Stats ─────────────────────────────────── -->
+<div class="stats-section">
+  <div class="stats-divider"></div>
+  <div class="stats-grid">
+    <div class="stat-tile">
+      <div class="stat-number">5,971</div>
+      <div class="stat-name">Training Samples</div>
+      <div class="stat-desc">Labeled SMS messages used for model training</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-number">98.4%</div>
+      <div class="stat-name">Accuracy</div>
+      <div class="stat-desc">Verified on held-out test set</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-number">SVM</div>
+      <div class="stat-name">Algorithm</div>
+      <div class="stat-desc">Support Vector Machine classifier</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-number">TF-IDF</div>
+      <div class="stat-name">Features</div>
+      <div class="stat-desc">Term frequency-inverse document frequency</div>
     </div>
   </div>
-
 </div>
 
-<!-- ── Stats Strip ── -->
-<div class="stats-strip container px-3">
-  <div class="stat-box">
-    <div class="stat-num">5,971</div>
-    <div class="stat-lbl">Training Samples</div>
-  </div>
-  <div class="stat-box">
-    <div class="stat-num">98.4%</div>
-    <div class="stat-lbl">Accuracy</div>
-  </div>
-  <div class="stat-box">
-    <div class="stat-num">SVM</div>
-    <div class="stat-lbl">Algorithm</div>
-  </div>
-  <div class="stat-box">
-    <div class="stat-num">TF-IDF</div>
-    <div class="stat-lbl">Features</div>
-  </div>
-</div>
+{% endblock %}
 
-<!-- ── Footer ── -->
-<footer>
-  <span>© 2025 SmishGuard — NLP-Based Smishing Detection System</span>
-  <div class="footer-right">
-    <div class="footer-links">
-      <a href="/model">Model Info</a>
-      <a href="/dataset">Dataset</a>
-      <a href="/about">About</a>
-    </div>
-  </div>
-</footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+{# ═══════════════════════════════════════════
+   PAGE SCRIPTS
+═══════════════════════════════════════════ #}
+{% block scripts %}
 <script>
-  const textarea    = document.getElementById('smsInput');
-  const charCount   = document.getElementById('charCount');
-  const scanBtn     = document.getElementById('scanBtn');
-  const resultPanel = document.getElementById('resultPanel');
+  /* ── Inject "Get Started" CTA into base navbar ── */
+  document.querySelector('.nav-right').insertAdjacentHTML('afterbegin', `
+    <a href="#scanner" class="btn-nav-cta">
+      <i class="fa-solid fa-bolt"></i> Get Started
+    </a>
+  `);
+
+  /* ── Char counter ── */
+  const textarea  = document.getElementById('smsInput');
+  const charCount = document.getElementById('charCount');
+  const resultBox = document.getElementById('resultBox');
 
   textarea.addEventListener('input', () => {
-    const n = textarea.value.length;
-    charCount.textContent = n;
-    charCount.parentElement.className = 'char-counter' + (n > 1400 ? ' over' : n > 1000 ? ' warn' : '');
+    charCount.textContent = textarea.value.length;
   });
 
-  document.querySelectorAll('.example-pill').forEach(btn => {
+  /* ── Example pills ── */
+  document.querySelectorAll('.ex-tag').forEach(btn => {
     btn.addEventListener('click', () => {
       textarea.value = btn.dataset.text;
-      textarea.dispatchEvent(new Event('input'));
-      resultPanel.classList.remove('show', 'threat', 'safe');
+      charCount.textContent = textarea.value.length;
+      resultBox.classList.remove('show', 'is-threat', 'is-safe');
     });
   });
 
+  /* ── Keyboard shortcut: Ctrl/Cmd + Enter ── */
+  textarea.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') analyzeMessage();
+  });
+
+  /* ── Core analysis function ── */
   async function analyzeMessage() {
     const sms = textarea.value.trim();
     if (!sms) { textarea.focus(); return; }
 
-    scanBtn.disabled = true;
-    scanBtn.innerHTML = '<span class="spinner"></span> Analyzing…';
-    resultPanel.classList.remove('show', 'threat', 'safe');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const inlineSend = document.getElementById('inlineSend');
+
+    analyzeBtn.disabled = true;
+    inlineSend.disabled = true;
+    analyzeBtn.innerHTML = '<span class="spinner"></span> Analyzing…';
+    resultBox.classList.remove('show', 'is-threat', 'is-safe');
 
     try {
       const resp = await fetch('/predict', {
@@ -566,50 +533,44 @@
     } catch (e) {
       showError('Network error — is the server running?');
     } finally {
-      scanBtn.disabled = false;
-      scanBtn.innerHTML = '<i class="fa fa-magnifying-glass"></i> Analyze Message';
+      analyzeBtn.disabled = false;
+      inlineSend.disabled = false;
+      analyzeBtn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Analyze Message';
     }
   }
 
   function showResult(data) {
     const isThreat = data.label === 'threat';
-    resultPanel.className = 'result-panel show ' + (isThreat ? 'threat' : 'safe');
+    resultBox.className = 'result-box show ' + (isThreat ? 'is-threat' : 'is-safe');
 
     document.getElementById('resultIcon').innerHTML = isThreat
-      ? '<i class="fa fa-triangle-exclamation"></i>'
-      : '<i class="fa fa-circle-check"></i>';
+      ? '<i class="fa-solid fa-triangle-exclamation"></i>'
+      : '<i class="fa-solid fa-circle-check"></i>';
 
-    document.getElementById('resultTitle').textContent = data.prediction;
+    document.getElementById('resultLabel').textContent = data.prediction;
 
-    if (isThreat) {
-      document.getElementById('resultSub').textContent = 'High-risk message — potential smishing attack';
-      document.getElementById('resultTip').innerHTML = `
-        <strong style="color:var(--danger)">Do not interact with this message.</strong>
-        It exhibits patterns strongly associated with smishing or spam. Avoid clicking any links,
-        calling back numbers, or sharing personal or financial information.
-        Report it to your carrier by forwarding to <strong>7726 (SPAM)</strong>.`;
-    } else {
-      document.getElementById('resultSub').textContent = 'No threat indicators found';
-      document.getElementById('resultTip').innerHTML = `
-        <strong style="color:var(--safe)">Message appears safe.</strong>
-        No smishing patterns were detected. That said, no automated system is 100% accurate —
-        if anything feels off, trust your instincts and verify with the sender through a known channel.`;
-    }
+    document.getElementById('resultDesc').textContent = isThreat
+      ? 'High-risk — potential smishing attack'
+      : 'No threat indicators detected';
 
-    resultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    document.getElementById('resultTip').innerHTML = isThreat
+      ? `<strong style="color:var(--danger)">Do not interact.</strong>
+         This message exhibits known smishing patterns. Avoid clicking any links
+         or sharing personal information. Report by forwarding to
+         <strong>7726 (SPAM)</strong>.`
+      : `<strong style="color:var(--accent)">Message appears safe.</strong>
+         No phishing or smishing patterns detected. If anything still feels off,
+         verify through a known, trusted channel.`;
+
+    resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   function showError(msg) {
-    resultPanel.className = 'result-panel show threat';
-    document.getElementById('resultIcon').innerHTML = '<i class="fa fa-circle-xmark"></i>';
-    document.getElementById('resultTitle').textContent = 'Analysis Failed';
-    document.getElementById('resultSub').textContent = 'Could not complete the request';
-    document.getElementById('resultTip').innerHTML = `<span style="color:var(--danger)">${msg}</span>`;
+    resultBox.className = 'result-box show is-threat';
+    document.getElementById('resultIcon').innerHTML  = '<i class="fa-solid fa-circle-xmark"></i>';
+    document.getElementById('resultLabel').textContent = 'Analysis Failed';
+    document.getElementById('resultDesc').textContent  = 'Could not complete the request';
+    document.getElementById('resultTip').innerHTML     = `<span style="color:var(--danger)">${msg}</span>`;
   }
-
-  textarea.addEventListener('keydown', e => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') analyzeMessage();
-  });
 </script>
-</body>
-</html>
+{% endblock %}

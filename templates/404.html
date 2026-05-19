@@ -1,152 +1,192 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SmishGuard — 404</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <style>
-    :root {
-      --bg:        #f7f8fc;
-      --surface:   #ffffff;
-      --border:    #e2e6f0;
-      --accent:    #2563eb;
-      --accent-bg: #eff5ff;
-      --text:      #0f172a;
-      --text-muted:#64748b;
-      --text-faint:#94a3b8;
-      --mono:      'DM Mono', monospace;
-      --sans:      'Sora', sans-serif;
-      --shadow-lg: 0 12px 40px rgba(15,23,42,.1), 0 2px 8px rgba(15,23,42,.05);
-    }
+{% extends "base.html" %}
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+{% block title %}SmishGuard AI — 404{% endblock %}
 
-    body {
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 2rem;
-    }
+{% block head_extra %}
+<style>
+  .site-main {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 4rem 2rem !important;
+  }
 
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image: radial-gradient(circle, #d1d5e8 1px, transparent 1px);
-      background-size: 28px 28px;
-      opacity: .45;
-      pointer-events: none;
-    }
+  .error-wrap {
+    max-width: 520px;
+    width: 100%;
+    text-align: center;
+  }
 
-    .card {
-      position: relative; z-index: 1;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 3.5rem 3rem;
-      max-width: 440px;
-      width: 100%;
-      box-shadow: var(--shadow-lg);
-    }
+  .ghost-code {
+    font-family: var(--display);
+    font-size: clamp(6rem, 18vw, 10rem);
+    font-weight: 900;
+    letter-spacing: -.04em;
+    line-height: .9;
+    text-transform: uppercase;
+    color: transparent;
+    -webkit-text-stroke: 2.5px var(--border-strong);
+    user-select: none;
+    margin-bottom: -.2em;
+    animation: fadeDown .5s .05s ease both;
+  }
 
-    .error-code {
-      font-family: var(--mono);
-      font-size: 5.5rem;
-      font-weight: 500;
-      color: var(--accent);
-      opacity: .12;
-      line-height: 1;
-      margin-bottom: -.3rem;
-      letter-spacing: -.04em;
-      user-select: none;
-    }
+  .icon-ring {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 68px; height: 68px;
+    background: var(--accent-light);
+    border: 1.5px solid var(--safe-border);
+    border-radius: 18px;
+    font-size: 1.6rem;
+    color: var(--accent);
+    margin: 1.8rem auto 1.6rem;
+    animation: fadeDown .5s .1s ease both;
+    box-shadow: 0 4px 20px rgba(15,159,92,.15);
+  }
 
-    .icon-wrap {
-      width: 60px; height: 60px;
-      background: var(--accent-bg);
-      border: 1px solid #bfdbfe;
-      border-radius: 16px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.4rem;
-      color: var(--accent);
-      margin: 1.2rem auto 1.5rem;
-    }
+  .error-heading {
+    font-family: var(--display);
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -.01em;
+    line-height: .95;
+    color: var(--text);
+    margin-bottom: .9rem;
+    animation: fadeDown .5s .15s ease both;
+  }
+  .error-heading .word-green { color: var(--accent); }
 
-    h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: -.03em;
-      margin-bottom: .5rem;
-    }
+  .error-sub {
+    font-size: .92rem;
+    color: var(--text-muted);
+    line-height: 1.75;
+    max-width: 360px;
+    margin: 0 auto 2.5rem;
+    animation: fadeDown .5s .2s ease both;
+  }
 
-    p {
-      color: var(--text-muted);
-      font-size: .88rem;
-      line-height: 1.7;
-      margin-bottom: 2rem;
-    }
+  .error-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .75rem;
+    flex-wrap: wrap;
+    animation: fadeDown .5s .25s ease both;
+  }
 
-    .btn-home {
-      display: inline-flex; align-items: center; gap: .5rem;
-      background: var(--accent);
-      color: #fff;
-      padding: .8rem 1.8rem;
-      border-radius: 10px;
-      text-decoration: none;
-      font-size: .88rem;
-      font-weight: 600;
-      transition: background .18s, box-shadow .2s, transform .12s;
-      box-shadow: 0 2px 12px rgba(37,99,235,.3);
-    }
-    .btn-home:hover {
-      background: #1d4ed8;
-      color: #fff;
-      box-shadow: 0 4px 20px rgba(37,99,235,.38);
-      transform: translateY(-1px);
-    }
+  .divider {
+    display: flex; align-items: center; gap: 1rem;
+    margin: 3rem auto 2rem;
+    max-width: 360px;
+    animation: fadeDown .5s .3s ease both;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .divider-label {
+    font-family: var(--mono); font-size: .65rem; color: var(--text-faint);
+    text-transform: uppercase; letter-spacing: .12em; white-space: nowrap;
+  }
 
-    .brand {
-      position: relative; z-index: 1;
-      margin-bottom: 2rem;
-      display: flex; align-items: center; justify-content: center; gap: .6rem;
-      font-family: var(--sans);
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -.02em;
-      text-decoration: none;
-    }
-    .brand-logo {
-      width: 30px; height: 30px;
-      background: var(--accent);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: .8rem;
-      box-shadow: 0 2px 8px rgba(37,99,235,.35);
-    }
-  </style>
-</head>
-<body>
+  .quick-links {
+    display: flex; justify-content: center; gap: .6rem; flex-wrap: wrap;
+    animation: fadeDown .5s .35s ease both;
+  }
+  .quick-link {
+    display: inline-flex; align-items: center; gap: .45rem;
+    font-family: var(--mono); font-size: .75rem; font-weight: 500;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: .5rem 1rem;
+    text-decoration: none;
+    transition: color .18s, background .18s, border-color .18s, transform .15s;
+  }
+  .quick-link:hover {
+    color: var(--accent);
+    background: var(--accent-light);
+    border-color: var(--safe-border);
+    transform: translateY(-2px);
+  }
+  .quick-link i { font-size: .65rem; }
 
-  <a class="brand" href="/">
-    <div class="brand-logo"><i class="fa fa-shield-halved"></i></div>
-    SmishGuard
-  </a>
+  .status-row {
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
+    margin-top: 3rem;
+    font-family: var(--mono); font-size: .68rem; color: var(--text-faint);
+    animation: fadeDown .5s .4s ease both;
+  }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-light);
+    animation: pulse 2.2s ease infinite;
+  }
 
-  <div class="card">
-    <div class="error-code">404</div>
-    <div class="icon-wrap"><i class="fa fa-map-location-dot"></i></div>
-    <h1>Page Not Found</h1>
-    <p>This route doesn't exist. Head back to the detector and paste a message to analyze.</p>
-    <a href="/" class="btn-home"><i class="fa fa-arrow-left"></i> Return Home</a>
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: .55; transform: scale(.85); }
+  }
+
+  @media (max-width: 860px) {
+    .site-main { padding: 3rem 1.25rem !important; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-wrap">
+
+  <div class="page-badge" style="animation: fadeDown .5s ease both;">
+    <i class="fa-solid fa-circle-xmark" style="font-size:.6rem"></i>
+    Error 404
   </div>
 
-</body>
-</html>
+  <div class="ghost-code">404</div>
+
+  <div class="icon-ring">
+    <i class="fa-solid fa-map-location-dot"></i>
+  </div>
+
+  <h1 class="error-heading">
+    <span class="word-green">Page</span> Not<br>Found
+  </h1>
+
+  <p class="error-sub">
+    This route doesn't exist or may have moved. Head back to the detector and paste a suspicious SMS to analyze.
+  </p>
+
+  <div class="error-actions">
+    <a href="/" class="btn-primary-sg">
+      <i class="fa-solid fa-shield-halved"></i>
+      Launch Detector
+    </a>
+    <a href="javascript:history.back()" class="btn-ghost-sg">
+      <i class="fa-solid fa-arrow-left"></i>
+      Go Back
+    </a>
+  </div>
+
+  <div class="divider">
+    <span class="divider-label">or jump to</span>
+  </div>
+
+  <div class="quick-links">
+    <a href="/" class="quick-link"><i class="fa-solid fa-house"></i> Home</a>
+    <a href="/model" class="quick-link"><i class="fa-solid fa-robot"></i> Model</a>
+    <a href="/dataset" class="quick-link"><i class="fa-solid fa-database"></i> Dataset</a>
+    <a href="/about" class="quick-link"><i class="fa-solid fa-file-lines"></i> About</a>
+  </div>
+
+  <div class="status-row">
+    <span class="status-dot"></span>
+    <span>SmishGuard AI — system operational</span>
+  </div>
+
+</div>
+{% endblock %}

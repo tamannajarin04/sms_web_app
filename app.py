@@ -29,19 +29,19 @@ MAX_SMS_LENGTH = 1600   # ~10 concatenated SMS segments
 # ── Page routes ───────────────────────────────────────────────────────────────
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", active_page="home")
 
 @app.route("/model")
 def model_page():
-    return render_template("model.html")
+    return render_template("model.html", active_page="model")
 
 @app.route("/dataset")
 def dataset_page():
-    return render_template("dataset.html")
+    return render_template("dataset.html", active_page="dataset")
 
 @app.route("/about")
 def about_page():
-    return render_template("about.html")
+    return render_template("about.html", active_page="about")
 
 
 # ── Prediction route ──────────────────────────────────────────────────────────
@@ -85,7 +85,8 @@ def predict():
 # ── Error handlers ────────────────────────────────────────────────────────────
 @app.errorhandler(404)
 def not_found(e):
-    return render_template("404.html"), 404   # optional: add a 404 template
+    # 404 gets no active_page — no nav link should be highlighted
+    return render_template("404.html"), 404
 
 @app.errorhandler(405)
 def method_not_allowed(e):
