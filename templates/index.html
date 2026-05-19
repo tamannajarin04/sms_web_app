@@ -3,17 +3,12 @@
 {% block title %}SmishGuard AI — SMS Threat Detector{% endblock %}
 
 
-{# ═══════════════════════════════════════════
-   PAGE-SPECIFIC STYLES
-═══════════════════════════════════════════ #}
 {% block head_extra %}
 <style>
 
-  /* Index uses a wider max-width than base */
+  /* ── Index uses wider max-width than base ── */
   .hero-wrapper,
-  .stats-section,
-  .navbar-inner,
-  .footer-inner { max-width: 1200px; }
+  .stats-section { max-width: 1200px; }
 
   /* ── Nav CTA ── */
   .btn-nav-cta {
@@ -152,7 +147,7 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 18px;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-md);
     overflow: hidden;
   }
 
@@ -323,16 +318,6 @@
 {% endblock %}
 
 
-{# ═══════════════════════════════════════════
-   NAVBAR EXTRA  (Get Started CTA button)
-   Injected via JS after DOM load since
-   base.html owns the navbar markup.
-═══════════════════════════════════════════ #}
-
-
-{# ═══════════════════════════════════════════
-   PAGE CONTENT
-═══════════════════════════════════════════ #}
 {% block content %}
 
 <!-- ── Hero ─────────────────────────────────── -->
@@ -473,9 +458,6 @@
 {% endblock %}
 
 
-{# ═══════════════════════════════════════════
-   PAGE SCRIPTS
-═══════════════════════════════════════════ #}
 {% block scripts %}
 <script>
   /* ── Inject "Get Started" CTA into base navbar ── */

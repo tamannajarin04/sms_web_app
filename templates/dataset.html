@@ -3,9 +3,6 @@
 {% block title %}SmishGuard AI — Dataset{% endblock %}
 
 
-{# ═══════════════════════════════════════════
-   PAGE-SPECIFIC STYLES
-═══════════════════════════════════════════ #}
 {% block head_extra %}
 <style>
 
@@ -75,9 +72,10 @@
     border-radius: 5px; padding: .22rem .6rem; flex-shrink: 0;
     margin-top: .1rem; text-transform: uppercase; letter-spacing: .05em;
   }
-  .sample-badge.ham     { background: var(--safe-bg);   color: var(--accent); border: 1px solid var(--safe-border); }
-  .sample-badge.threat  { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
-  .sample-badge.spam    { background: var(--warn-bg);   color: var(--warn);   border: 1px solid var(--warn-border); }
+  .sample-badge.ham    { background: var(--safe-bg);   color: var(--accent); border: 1px solid var(--safe-border); }
+  .sample-badge.threat { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+  .sample-badge.spam   { background: var(--warn-bg);   color: var(--warn);   border: 1px solid var(--warn-border); }
+
   .sample-text { font-size: .85rem; color: var(--text-2); line-height: 1.65; }
 
   /* ── Data Table ── */
@@ -139,9 +137,6 @@
 {% endblock %}
 
 
-{# ═══════════════════════════════════════════
-   PAGE CONTENT
-═══════════════════════════════════════════ #}
 {% block content %}
 
 <!-- ── Page Header ──────────────────────────── -->
@@ -157,7 +152,6 @@
   <p>Dataset_5971.csv — 5,971 labeled SMS messages used to train and evaluate the model.</p>
 </div>
 
-<!-- ── Content ──────────────────────────────── -->
 <div class="content-wrap">
 
   <!-- Overview -->
@@ -308,12 +302,8 @@
 {% endblock %}
 
 
-{# ═══════════════════════════════════════════
-   PAGE SCRIPTS
-═══════════════════════════════════════════ #}
 {% block scripts %}
 <script>
-  /* ── Animated label distribution bars ── */
   const labels = [
     { name: 'ham',      count: 4844, pct: 81.1, color: '#0f9f5c' },
     { name: 'Smishing', count:  616, pct: 10.3, color: '#c93030' },
@@ -341,7 +331,6 @@
     chart.appendChild(row);
   });
 
-  /* Trigger bar animations after a short delay */
   setTimeout(() => {
     document.querySelectorAll('.label-fill').forEach(b => {
       b.style.width = b.dataset.w;

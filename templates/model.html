@@ -3,9 +3,6 @@
 {% block title %}SmishGuard AI — Model{% endblock %}
 
 
-{# ═══════════════════════════════════════════
-   PAGE-SPECIFIC STYLES
-═══════════════════════════════════════════ #}
 {% block head_extra %}
 <style>
 
@@ -138,14 +135,10 @@
   .code-dot.r { background: #ff5f57; }
   .code-dot.y { background: #febc2e; }
   .code-dot.g { background: #28c840; }
-  pre {
-    padding: 1.4rem;
-    font-family: var(--mono); font-size: .8rem;
-    line-height: 1.9; overflow-x: auto;
-    color: var(--text-2); margin: 0;
-  }
+
+  /* ── Syntax colors (model page only) ── */
   .fn  { color: var(--accent); }
-  .str { color: #e08c00; }
+  .str-warm { color: #e08c00; }
   .num { color: #2979d8; }
 
   /* ── Why LinearSVC Cards ── */
@@ -193,9 +186,6 @@
 {% endblock %}
 
 
-{# ═══════════════════════════════════════════
-   PAGE CONTENT
-═══════════════════════════════════════════ #}
 {% block content %}
 
 <!-- ── Page Header ──────────────────────────── -->
@@ -211,7 +201,6 @@
   <p>LinearSVC + TF-IDF — trained, evaluated, and deployed for real-time smishing detection.</p>
 </div>
 
-<!-- ── Content ──────────────────────────────── -->
 <div class="content-wrap">
 
   <!-- Pipeline -->
@@ -312,7 +301,7 @@
 
 vectorizer = <span class="fn">TfidfVectorizer</span>(
     <span class="cm"># Remove English stop words (the, is, at...)</span>
-    stop_words=<span class="str">'english'</span>,
+    stop_words=<span class="str-warm">'english'</span>,
 
     <span class="cm"># Consider 1-gram and 2-gram token combinations</span>
     ngram_range=(<span class="num">1</span>, <span class="num">2</span>),
@@ -363,12 +352,8 @@ vectorizer = <span class="fn">TfidfVectorizer</span>(
 {% endblock %}
 
 
-{# ═══════════════════════════════════════════
-   PAGE SCRIPTS
-═══════════════════════════════════════════ #}
 {% block scripts %}
 <script>
-  /* ── Animated comparison bar chart ── */
   const models = [
     { name: 'LinearSVC',           acc: 98.4, winner: true  },
     { name: 'Logistic Regression', acc: 97.6, winner: false },
@@ -397,7 +382,6 @@ vectorizer = <span class="fn">TfidfVectorizer</span>(
     container.appendChild(row);
   });
 
-  /* Animate bars after a short delay so CSS transition fires */
   setTimeout(() => {
     document.querySelectorAll('.bar-fill').forEach(b => {
       b.style.width = b.dataset.w;
