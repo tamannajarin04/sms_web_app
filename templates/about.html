@@ -2,279 +2,456 @@
 
 {% block title %}SmishGuard AI — About{% endblock %}
 
-
-{# ═══════════════════════════════════════════
-   PAGE-SPECIFIC STYLES
-═══════════════════════════════════════════ #}
 {% block head_extra %}
 <style>
 
-  /* ── Tech Stack Grid ── */
+  /* ── Tech stack ── */
   .tech-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
-    gap: .8rem;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: .75rem;
   }
   .tech-card {
-    background: var(--surface-2); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 1.2rem .9rem 1rem;
-    text-align: center; cursor: default;
-    transition: border-color .2s, transform .2s, box-shadow .2s;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 1.4rem 1rem 1.2rem;
+    text-align: center;
+    cursor: default;
+    transition: border-color .2s, transform .2s;
+    position: relative; overflow: hidden;
+  }
+  .tech-card::before {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-dim), transparent);
+    transform: scaleX(0); transform-origin: center;
+    transition: transform .3s;
   }
   .tech-card:hover {
-    border-color: var(--safe-border);
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
+    border-color: var(--border-2);
+    transform: translateY(-2px);
   }
-  .tech-icon { font-size: 1.6rem; margin-bottom: .55rem; line-height: 1; }
-  .tech-name { font-family: var(--mono); font-size: .75rem; color: var(--text); font-weight: 500; }
-  .tech-role { font-size: .65rem; color: var(--text-faint); margin-top: .15rem; }
+  .tech-card:hover::before { transform: scaleX(1); }
+  .tech-icon {
+    font-size: 1.45rem; margin-bottom: .65rem; line-height: 1;
+  }
+  .tech-name {
+    font-family: var(--font-mono); font-size: .7rem;
+    color: var(--text-2); font-weight: 500;
+  }
+  .tech-role {
+    font-size: .63rem; color: var(--text-faint); margin-top: .2rem;
+    font-family: var(--font-mono);
+  }
 
-  /* ── API Endpoints ── */
-  .endpoint-block {
-    background: var(--surface-2); border: 1px solid var(--border);
-    border-radius: 10px; overflow: hidden; margin-bottom: .75rem;
+  /* ── Endpoints ── */
+  .endpoint-list {
+    display: flex; flex-direction: column; gap: .6rem;
   }
-  .endpoint-block:last-child { margin-bottom: 0; }
-  .endpoint-head {
-    padding: .8rem 1.2rem;
-    display: flex; align-items: center; gap: .75rem;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
+  .ep-row {
+    display: flex; align-items: center; gap: 1rem;
+    padding: .9rem 1.2rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    transition: border-color .15s;
   }
-  .endpoint-head.no-body { border-bottom: none; }
+  .ep-row:hover { border-color: var(--border-2); }
   .method-pill {
-    font-family: var(--mono); font-size: .68rem; font-weight: 500;
-    padding: .2rem .65rem; border-radius: 5px; flex-shrink: 0;
+    font-family: var(--font-mono); font-size: .58rem; font-weight: 600;
+    padding: .2rem .65rem;
+    border-radius: var(--r-xs);
+    text-transform: uppercase; letter-spacing: .08em;
+    flex-shrink: 0;
   }
-  .method-pill.post { background: var(--accent-light); color: var(--accent); border: 1px solid var(--safe-border); }
-  .method-pill.get  { background: var(--surface-3);   color: var(--text-muted); border: 1px solid var(--border); }
-  .endpoint-path { font-family: var(--mono); font-size: .82rem; color: var(--text); font-weight: 500; }
-  .endpoint-note { font-size: .76rem; color: var(--text-faint); margin-left: auto; }
-  .endpoint-body { padding: 1.1rem 1.2rem; }
-  .code-label {
-    font-family: var(--mono); font-size: .62rem; font-weight: 500;
-    color: var(--text-faint); text-transform: uppercase; letter-spacing: .1em;
-    margin-bottom: .45rem; margin-top: .9rem;
+  .pill-post {
+    background: var(--accent-glass);
+    color: var(--accent-text);
+    border: 1px solid rgba(16,209,124,.2);
   }
-  .code-label:first-child { margin-top: 0; }
+  .pill-get {
+    background: var(--surface-3);
+    color: var(--text-muted);
+    border: 1px solid var(--border-2);
+  }
+  .ep-path {
+    font-family: var(--font-mono); font-size: .82rem;
+    color: var(--text); font-weight: 500;
+  }
+  .ep-desc {
+    font-size: .78rem; color: var(--text-faint);
+    margin-left: auto;
+    font-family: var(--font-mono);
+    letter-spacing: .02em;
+  }
+
+  /* POST /predict expanded detail */
+  .ep-detail {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    overflow: hidden;
+    margin-bottom: .6rem;
+  }
+  .ep-detail-head {
+    display: flex; align-items: center; gap: 1rem;
+    padding: .9rem 1.2rem;
+    background: var(--surface-3);
+    border-bottom: 1px solid var(--border);
+  }
+  .ep-detail-body {
+    padding: 1.25rem 1.4rem;
+    display: flex; flex-direction: column; gap: 1.25rem;
+  }
+  .ep-field-group { display: flex; flex-direction: column; gap: .5rem; }
+  .ep-field-label {
+    font-family: var(--font-mono); font-size: .58rem; font-weight: 500;
+    color: var(--text-faint); text-transform: uppercase; letter-spacing: .14em;
+  }
+  .ep-payload {
+    display: flex; flex-direction: column; gap: .4rem;
+  }
+  .ep-payload-row {
+    display: flex; align-items: center; gap: .75rem;
+    padding: .65rem 1rem;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    font-family: var(--font-mono); font-size: .76rem;
+  }
+  .ep-key   { color: var(--accent-text); flex-shrink: 0; }
+  .ep-sep   { color: var(--text-faint); flex-shrink: 0; }
+  .ep-val   { color: var(--text-2); }
+  .ep-comment { color: var(--text-faint); font-size: .68rem; margin-left: auto; font-style: italic; }
+
+  /* curl block */
+  .curl-block {
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 1rem 1.1rem;
+    font-family: var(--font-mono); font-size: .74rem; line-height: 1.9;
+    color: var(--text-2);
+    overflow-x: auto;
+  }
+  .curl-kw  { color: var(--text-muted); }
+  .curl-flag { color: var(--accent-pale); }
+  .curl-str { color: var(--text-2); }
+  .curl-url  { color: var(--accent-text); }
 
   /* ── Limitations ── */
-  .limit-list { list-style: none; display: flex; flex-direction: column; gap: .65rem; }
-  .limit-list li {
+  .limit-list {
+    list-style: none;
+    display: flex; flex-direction: column; gap: .55rem;
+  }
+  .limit-item {
     display: flex; align-items: flex-start; gap: .9rem;
-    font-size: .86rem; color: var(--text-muted); line-height: 1.65;
-    padding: .85rem 1.1rem; background: var(--surface-2);
-    border: 1px solid var(--border); border-radius: 9px;
-    transition: border-color .18s;
+    padding: .95rem 1.1rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    font-size: .85rem; color: var(--text-muted); line-height: 1.75;
+    transition: border-color .15s;
   }
-  .limit-list li:hover { border-color: var(--warn-border); }
-  .warn-dot {
-    width: 24px; height: 24px; flex-shrink: 0; margin-top: .05rem;
-    background: var(--warn-bg); border: 1px solid var(--warn-border);
-    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  .limit-item:hover { border-color: var(--warn-border); }
+  .limit-icon {
+    width: 24px; height: 24px; flex-shrink: 0; margin-top: .1rem;
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--warn); font-size: .52rem;
   }
-  .warn-dot i { font-size: .55rem; color: var(--warn); }
 
-  /* ── Responsive ── */
+  /* ── What is smishing — two-col layout ── */
+  .what-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1.25rem;
+  }
+  .what-col {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 1.25rem 1.3rem;
+  }
+  .what-col-head {
+    font-family: var(--font-mono); font-size: .58rem; font-weight: 500;
+    color: var(--text-faint); text-transform: uppercase; letter-spacing: .14em;
+    margin-bottom: .85rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .what-col-head i { font-size: .55rem; }
+  .tactic-list { list-style: none; display: flex; flex-direction: column; gap: .4rem; }
+  .tactic-list li {
+    font-size: .81rem; color: var(--text-muted); line-height: 1.6;
+    display: flex; align-items: flex-start; gap: .6rem;
+    padding: .45rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .tactic-list li:last-child { border-bottom: none; padding-bottom: 0; }
+  .tactic-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--danger); flex-shrink: 0; margin-top: .45rem;
+  }
+
+  /* CTA */
+  .cta-inner {
+    max-width: 480px; margin: 0 auto;
+  }
+
   @media (max-width: 860px) {
-    .tech-grid    { grid-template-columns: repeat(3, 1fr); }
-    .endpoint-note { display: none; }
+    .what-grid { grid-template-columns: 1fr; }
+    .tech-grid { grid-template-columns: repeat(3, 1fr); }
+    .ep-desc   { display: none; }
   }
 </style>
 {% endblock %}
 
 
-{# ═══════════════════════════════════════════
-   PAGE CONTENT
-═══════════════════════════════════════════ #}
 {% block content %}
 
-<!-- ── Page Header ──────────────────────────── -->
+<!-- ── Page header ─────────────────────────────────────────── -->
 <div class="page-header">
-  <div class="page-badge">
-    <i class="fa-solid fa-file-lines" style="font-size:.6rem"></i>
-    Project Overview
+  <div class="page-header-rule">
+    <span class="page-eyebrow">Project Overview</span>
   </div>
   <h1>
-    <span class="word-green">About</span><br>
-    <span class="word-ghost">SmishGuard</span>
+    About <span class="hl">Smish</span><span class="serif">Guard</span>
   </h1>
   <p>An NLP-based smishing detection system built with scikit-learn, TF-IDF, and Flask — designed to protect users from SMS phishing attacks in real time.</p>
 </div>
 
-<!-- ── Content ──────────────────────────────── -->
 <div class="content-wrap">
 
-  <!-- What is Smishing -->
-  <div class="section-card">
-    <div class="section-label">
-      <i class="fa-solid fa-circle-question"></i>
+  <!-- ── What is Smishing ─────────────────────────────────── -->
+  <div class="card">
+    <div class="s-label">
+      <span class="s-num">01</span>
       What is Smishing?
     </div>
-    <p class="body-text">
+    <p class="body-p">
       <strong>Smishing</strong> (SMS + Phishing) is a form of social engineering where attackers
       send deceptive text messages to trick recipients into revealing sensitive information,
-      clicking malicious links, or making fraudulent payments.
+      clicking malicious links, or making fraudulent payments. Attacks are crafted with urgency
+      cues designed to bypass critical thinking.
     </p>
-    <p class="body-text">
-      Common tactics include fake bank alerts, prize notifications, package delivery scams,
-      and government impersonation — often crafted with urgency cues to bypass critical
-      thinking. SmishGuard uses machine learning to detect these linguistic patterns automatically.
-    </p>
+
+    <div class="what-grid">
+      <div class="what-col">
+        <div class="what-col-head">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+          Common attack tactics
+        </div>
+        <ul class="tactic-list">
+          <li><span class="tactic-dot"></span>Fake bank account suspension alerts</li>
+          <li><span class="tactic-dot"></span>Prize or lottery win notifications</li>
+          <li><span class="tactic-dot"></span>Package delivery re-scheduling scams</li>
+          <li><span class="tactic-dot"></span>Government agency impersonation</li>
+          <li><span class="tactic-dot"></span>Malicious shortened URL links</li>
+        </ul>
+      </div>
+      <div class="what-col">
+        <div class="what-col-head">
+          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+          How SmishGuard detects them
+        </div>
+        <ul class="tactic-list">
+          <li><span class="tactic-dot" style="background:var(--accent-text)"></span>TF-IDF vectorisation of message text</li>
+          <li><span class="tactic-dot" style="background:var(--accent-text)"></span>LinearSVC pattern classification</li>
+          <li><span class="tactic-dot" style="background:var(--accent-text)"></span>Trained on 5,971 labelled SMS messages</li>
+          <li><span class="tactic-dot" style="background:var(--accent-text)"></span>Sub-50 ms inference per message</li>
+          <li><span class="tactic-dot" style="background:var(--accent-text)"></span>98.4% accuracy on held-out test set</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
-  <!-- Tech Stack -->
-  <div class="section-card">
-    <div class="section-label">
-      <i class="fa-solid fa-layer-group"></i>
+  <!-- ── Technology Stack ─────────────────────────────────── -->
+  <div class="card">
+    <div class="s-label">
+      <span class="s-num">02</span>
       Technology Stack
     </div>
     <div class="tech-grid">
       <div class="tech-card">
-        <div class="tech-icon" style="color:#3776ab"><i class="fa-brands fa-python"></i></div>
+        <div class="tech-icon" style="color:#3776ab" aria-hidden="true"><i class="fa-brands fa-python"></i></div>
         <div class="tech-name">Python 3</div>
         <div class="tech-role">Core language</div>
       </div>
       <div class="tech-card">
-        <div class="tech-icon" style="color:#e44d26"><i class="fa-solid fa-flask-vial"></i></div>
+        <div class="tech-icon" style="color:#b5c6d4" aria-hidden="true"><i class="fa-solid fa-flask-vial"></i></div>
         <div class="tech-name">Flask</div>
         <div class="tech-role">Web framework</div>
       </div>
       <div class="tech-card">
-        <div class="tech-icon" style="color:#f7931e"><i class="fa-solid fa-robot"></i></div>
+        <div class="tech-icon" style="color:#f7931e" aria-hidden="true"><i class="fa-solid fa-robot"></i></div>
         <div class="tech-name">scikit-learn</div>
         <div class="tech-role">ML models</div>
       </div>
       <div class="tech-card">
-        <div class="tech-icon" style="color:var(--accent)"><i class="fa-solid fa-table-cells"></i></div>
+        <div class="tech-icon" style="color:var(--accent-text)" aria-hidden="true"><i class="fa-solid fa-table-cells"></i></div>
         <div class="tech-name">TF-IDF</div>
-        <div class="tech-role">Vectorization</div>
+        <div class="tech-role">Vectorisation</div>
       </div>
       <div class="tech-card">
-        <div class="tech-icon" style="color:#150458"><i class="fa-solid fa-chart-bar"></i></div>
+        <div class="tech-icon" style="color:#e0a84c" aria-hidden="true"><i class="fa-solid fa-chart-bar"></i></div>
         <div class="tech-name">pandas</div>
         <div class="tech-role">Data wrangling</div>
       </div>
       <div class="tech-card">
-        <div class="tech-icon" style="color:#7952b3"><i class="fa-brands fa-bootstrap"></i></div>
-        <div class="tech-name">Bootstrap 5</div>
-        <div class="tech-role">UI framework</div>
-      </div>
-      <div class="tech-card">
-        <div class="tech-icon" style="color:#d4a017"><i class="fa-brands fa-js"></i></div>
+        <div class="tech-icon" style="color:#62748a" aria-hidden="true"><i class="fa-brands fa-js"></i></div>
         <div class="tech-name">JavaScript</div>
         <div class="tech-role">Frontend logic</div>
       </div>
       <div class="tech-card">
-        <div class="tech-icon" style="color:#e05d35"><i class="fa-solid fa-box"></i></div>
+        <div class="tech-icon" style="color:#62748a" aria-hidden="true"><i class="fa-solid fa-box"></i></div>
         <div class="tech-name">joblib</div>
-        <div class="tech-role">Serialization</div>
+        <div class="tech-role">Serialisation</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon" style="color:var(--text-muted)" aria-hidden="true"><i class="fa-solid fa-microchip"></i></div>
+        <div class="tech-name">LinearSVC</div>
+        <div class="tech-role">Classifier</div>
       </div>
     </div>
   </div>
 
-  <!-- API Reference -->
-  <div class="section-card">
-    <div class="section-label">
-      <i class="fa-solid fa-plug"></i>
+  <!-- ── API Reference ────────────────────────────────────── -->
+  <div class="card">
+    <div class="s-label">
+      <span class="s-num">03</span>
       API Reference
     </div>
 
-    <!-- POST /predict -->
-    <div class="endpoint-block">
-      <div class="endpoint-head">
-        <span class="method-pill post">POST</span>
-        <span class="endpoint-path">/predict</span>
-        <span class="endpoint-note">Classify an SMS message</span>
+    <!-- POST /predict — expanded -->
+    <div class="ep-detail">
+      <div class="ep-detail-head">
+        <span class="method-pill pill-post">POST</span>
+        <span class="ep-path">/predict</span>
+        <span class="ep-desc">Classify an SMS message</span>
       </div>
-      <div class="endpoint-body">
-        <div class="code-label">Request Body (JSON)</div>
-        <pre>{ <span class="key">"sms"</span>: <span class="str">"Your message text here..."</span> }</pre>
+      <div class="ep-detail-body">
 
-        <div class="code-label">Response — 200 OK</div>
-        <pre>{
-  <span class="key">"prediction"</span>: <span class="str">"Spam / Smishing"</span>,  <span class="cm">// or "Legitimate SMS"</span>
-  <span class="key">"label"</span>: <span class="str">"threat"</span>              <span class="cm">// or "safe"</span>
-}</pre>
+        <div class="ep-field-group">
+          <div class="ep-field-label">Request body</div>
+          <div class="ep-payload">
+            <div class="ep-payload-row">
+              <span class="ep-key">"sms"</span>
+              <span class="ep-sep">:</span>
+              <span class="ep-val">string</span>
+              <span class="ep-comment">The raw SMS text to classify</span>
+            </div>
+          </div>
+        </div>
 
-        <div class="code-label">cURL Example</div>
-        <pre><span class="kw">curl</span> -X POST http://localhost:5000/predict \
-  -H <span class="str">"Content-Type: application/json"</span> \
-  -d <span class="str">'{"sms": "Congratulations! You won £500. Click: http://bit.ly/x"}'</span></pre>
+        <div class="ep-field-group">
+          <div class="ep-field-label">Response — 200 OK</div>
+          <div class="ep-payload">
+            <div class="ep-payload-row">
+              <span class="ep-key">"prediction"</span>
+              <span class="ep-sep">:</span>
+              <span class="ep-val">"Spam / Smishing"</span>
+              <span class="ep-comment">or "Legitimate SMS"</span>
+            </div>
+            <div class="ep-payload-row">
+              <span class="ep-key">"label"</span>
+              <span class="ep-sep">:</span>
+              <span class="ep-val">"threat"</span>
+              <span class="ep-comment">or "safe"</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ep-field-group">
+          <div class="ep-field-label">cURL example</div>
+          <div class="curl-block">
+            <span class="curl-kw">curl</span> -X POST <span class="curl-url">http://localhost:5000/predict</span> \<br>
+            &nbsp;&nbsp;<span class="curl-flag">-H</span> <span class="curl-str">"Content-Type: application/json"</span> \<br>
+            &nbsp;&nbsp;<span class="curl-flag">-d</span> <span class="curl-str">'{"sms": "You'\''ve won £500. Claim: http://bit.ly/x"}'</span>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <!-- GET / -->
-    <div class="endpoint-block">
-      <div class="endpoint-head no-body">
-        <span class="method-pill get">GET</span>
-        <span class="endpoint-path">/</span>
-        <span class="endpoint-note">Main detection UI</span>
+    <!-- GET routes -->
+    <div class="endpoint-list">
+      <div class="ep-row">
+        <span class="method-pill pill-get">GET</span>
+        <span class="ep-path">/</span>
+        <span class="ep-desc">Main detection interface</span>
+      </div>
+      <div class="ep-row">
+        <span class="method-pill pill-get">GET</span>
+        <span class="ep-path">/model</span>
+        <span class="ep-desc">Model architecture &amp; metrics</span>
+      </div>
+      <div class="ep-row">
+        <span class="method-pill pill-get">GET</span>
+        <span class="ep-path">/dataset</span>
+        <span class="ep-desc">Dataset explorer</span>
+      </div>
+      <div class="ep-row">
+        <span class="method-pill pill-get">GET</span>
+        <span class="ep-path">/about</span>
+        <span class="ep-desc">Project overview</span>
       </div>
     </div>
 
-    <!-- GET /model -->
-    <div class="endpoint-block">
-      <div class="endpoint-head no-body">
-        <span class="method-pill get">GET</span>
-        <span class="endpoint-path">/model</span>
-        <span class="endpoint-note">Model architecture &amp; metrics</span>
-      </div>
-    </div>
-
-    <!-- GET /dataset -->
-    <div class="endpoint-block">
-      <div class="endpoint-head no-body">
-        <span class="method-pill get">GET</span>
-        <span class="endpoint-path">/dataset</span>
-        <span class="endpoint-note">Dataset explorer</span>
-      </div>
-    </div>
   </div>
 
-  <!-- Limitations -->
-  <div class="section-card">
-    <div class="section-label">
-      <i class="fa-solid fa-triangle-exclamation"></i>
+  <!-- ── Limitations ──────────────────────────────────────── -->
+  <div class="card">
+    <div class="s-label">
+      <span class="s-num">04</span>
       Limitations &amp; Caveats
     </div>
-    <ul class="limit-list">
-      <li>
-        <span class="warn-dot"><i class="fa-solid fa-exclamation"></i></span>
-        The model is not 100% accurate. Always verify suspicious messages manually before taking action.
+    <ul class="limit-list" role="list">
+      <li class="limit-item">
+        <span class="limit-icon" aria-hidden="true"><i class="fa-solid fa-exclamation"></i></span>
+        The model is not 100% accurate. Always verify suspicious messages manually before taking any action.
       </li>
-      <li>
-        <span class="warn-dot"><i class="fa-solid fa-exclamation"></i></span>
-        Trained primarily on English-language SMS — performance on other languages may be reduced.
+      <li class="limit-item">
+        <span class="limit-icon" aria-hidden="true"><i class="fa-solid fa-exclamation"></i></span>
+        Trained primarily on English-language SMS messages — performance on other languages may be significantly reduced.
       </li>
-      <li>
-        <span class="warn-dot"><i class="fa-solid fa-exclamation"></i></span>
+      <li class="limit-item">
+        <span class="limit-icon" aria-hidden="true"><i class="fa-solid fa-exclamation"></i></span>
         Novel smishing techniques not present in the training data may evade detection (zero-day attacks).
       </li>
-      <li>
-        <span class="warn-dot"><i class="fa-solid fa-exclamation"></i></span>
-        Dataset class imbalance (~81% ham) may bias the model toward classifying borderline messages as legitimate.
+      <li class="limit-item">
+        <span class="limit-icon" aria-hidden="true"><i class="fa-solid fa-exclamation"></i></span>
+        Dataset class imbalance (~81% legitimate messages) may bias the model toward classifying borderline cases as safe.
       </li>
-      <li>
-        <span class="warn-dot"><i class="fa-solid fa-exclamation"></i></span>
+      <li class="limit-item">
+        <span class="limit-icon" aria-hidden="true"><i class="fa-solid fa-exclamation"></i></span>
         This tool is for educational and demonstration purposes only — not a substitute for professional security tooling.
       </li>
     </ul>
   </div>
 
-  <!-- CTA -->
+  <!-- ── CTA ──────────────────────────────────────────────── -->
   <div class="cta-block">
-    <div class="cta-eyebrow">Ready to test it?</div>
-    <div class="cta-title">
-      <span class="word-green">Try</span> the<br>Detector
+    <div class="cta-inner">
+      <div class="cta-eyebrow">Ready to test it?</div>
+      <div class="cta-title">
+        Try the <span class="serif">detector</span>
+      </div>
+      <p class="cta-sub">Paste any suspicious SMS and let the model analyse it in real time.</p>
+      <div class="cta-actions">
+        <a href="/" class="btn-primary">
+          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+          Launch Detector
+        </a>
+        <a href="/model" class="btn-ghost">
+          View model <i class="fa-solid fa-arrow-right" style="font-size:.68rem" aria-hidden="true"></i>
+        </a>
+      </div>
     </div>
-    <p class="cta-sub">Paste any suspicious SMS and let the model analyze it in real time.</p>
-    <a href="/" class="cta-btn">
-      <i class="fa-solid fa-shield-halved"></i>
-      Launch Detector
-    </a>
   </div>
 
-</div><!-- /content-wrap -->
+</div>
 {% endblock %}

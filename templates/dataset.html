@@ -2,136 +2,211 @@
 
 {% block title %}SmishGuard AI — Dataset{% endblock %}
 
-
 {% block head_extra %}
 <style>
 
-  /* ── Overview Grid ── */
-  .overview-grid {
+  /* ── Overview tiles ─────────────────────────────────────── */
+  .ov-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: .85rem;
+    grid-template-columns: repeat(5, 1fr);
+    gap: .75rem;
   }
   .ov-tile {
-    background: var(--surface-2); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 1.4rem 1rem; text-align: center;
-    transition: transform .2s, box-shadow .2s, border-color .2s;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 1.5rem 1rem 1.25rem;
+    text-align: center;
+    cursor: default;
+    position: relative; overflow: hidden;
+    transition: border-color .2s, transform .2s;
   }
-  .ov-tile:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--safe-border);
+  .ov-tile::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    transform: scaleX(0); transform-origin: center;
+    transition: transform .3s;
   }
+  .ov-tile:hover { border-color: var(--border-2); transform: translateY(-2px); }
+  .ov-tile:hover::after { transform: scaleX(1); }
   .ov-num {
-    font-family: var(--display); font-size: 2rem; font-weight: 900;
-    color: var(--accent); line-height: 1; letter-spacing: -.01em;
+    font-family: var(--font-display);
+    font-size: 1.9rem; font-weight: 700;
+    color: var(--text); line-height: 1;
+    letter-spacing: -.04em;
+    margin-bottom: .5rem;
   }
+  .ov-num .accent { color: var(--accent-text); }
   .ov-name {
-    font-size: .7rem; font-weight: 600; color: var(--text-faint);
-    text-transform: uppercase; letter-spacing: .1em; margin-top: .45rem;
+    font-family: var(--font-mono); font-size: .58rem; font-weight: 400;
+    color: var(--text-faint); text-transform: uppercase; letter-spacing: .14em;
   }
 
-  /* ── Label Distribution ── */
+  /* ── Label distribution ─────────────────────────────────── */
+  .label-table { display: flex; flex-direction: column; }
   .label-row {
-    display: flex; align-items: center; gap: 1.1rem;
-    padding: .85rem 0; border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 90px 1fr 70px 52px;
+    align-items: center; gap: 1.1rem;
+    padding: .9rem 0;
+    border-bottom: 1px solid var(--border);
   }
-  .label-row:last-child { border-bottom: none; }
+  .label-row:last-child  { border-bottom: none; padding-bottom: 0; }
+  .label-row:first-child { padding-top: 0; }
   .label-name {
-    font-family: var(--mono); font-size: .78rem; font-weight: 500;
-    width: 88px; flex-shrink: 0;
+    font-family: var(--font-mono); font-size: .72rem; font-weight: 500;
   }
   .label-track {
-    flex: 1; background: var(--surface-2); border: 1px solid var(--border);
-    border-radius: 6px; height: 9px; overflow: hidden;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: 100px; height: 5px; overflow: hidden;
   }
   .label-fill {
-    height: 100%; border-radius: 6px;
+    height: 100%; border-radius: 100px;
     transition: width 1s cubic-bezier(.22,.61,.36,1);
   }
   .label-count {
-    font-family: var(--mono); font-size: .76rem;
-    width: 60px; text-align: right; color: var(--text-muted);
+    font-family: var(--font-mono); font-size: .7rem;
+    color: var(--text-muted); text-align: right;
   }
   .label-pct {
-    font-family: var(--mono); font-size: .72rem;
-    width: 44px; text-align: right; font-weight: 500;
+    font-family: var(--font-mono); font-size: .72rem; font-weight: 500;
+    text-align: right;
   }
 
-  /* ── Sample Messages ── */
-  .sample-grid { display: grid; gap: .75rem; }
+  /* ── Sample messages ────────────────────────────────────── */
+  .samples-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .65rem;
+  }
   .sample-card {
-    background: var(--surface-2); border: 1px solid var(--border);
-    border-radius: 10px; padding: 1rem 1.15rem;
-    display: flex; gap: .9rem; align-items: flex-start;
-    transition: border-color .18s;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 1rem 1.1rem;
+    display: flex; flex-direction: column; gap: .65rem;
+    transition: border-color .15s;
   }
-  .sample-card:hover { border-color: var(--border-strong); }
-  .sample-badge {
-    font-family: var(--mono); font-size: .6rem; font-weight: 500;
-    border-radius: 5px; padding: .22rem .6rem; flex-shrink: 0;
-    margin-top: .1rem; text-transform: uppercase; letter-spacing: .05em;
+  .sample-card:hover { border-color: var(--border-2); }
+  .sample-meta {
+    display: flex; align-items: center; gap: .6rem;
   }
-  .sample-badge.ham    { background: var(--safe-bg);   color: var(--accent); border: 1px solid var(--safe-border); }
-  .sample-badge.threat { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
-  .sample-badge.spam   { background: var(--warn-bg);   color: var(--warn);   border: 1px solid var(--warn-border); }
+  .s-badge {
+    font-family: var(--font-mono); font-size: .55rem; font-weight: 500;
+    border-radius: var(--r-xs); padding: .18rem .55rem;
+    text-transform: uppercase; letter-spacing: .08em; flex-shrink: 0;
+  }
+  .s-badge.ham     { background: var(--accent-glass); color: var(--accent-text); border: 1px solid rgba(16,209,124,.2); }
+  .s-badge.threat  { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+  .s-badge.spam    { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-border); }
+  .sample-text {
+    font-size: .81rem; color: var(--text-muted); line-height: 1.75;
+  }
 
-  .sample-text { font-size: .85rem; color: var(--text-2); line-height: 1.65; }
-
-  /* ── Data Table ── */
-  .data-table { width: 100%; font-size: .84rem; border-collapse: collapse; }
-  .data-table thead tr { border-bottom: 1.5px solid var(--border); }
-  .data-table th {
-    font-family: var(--mono); font-size: .68rem; font-weight: 500;
-    color: var(--text-muted); text-transform: uppercase; letter-spacing: .09em;
+  /* ── Dataset columns table ──────────────────────────────── */
+  .col-table { width: 100%; border-collapse: collapse; }
+  .col-table thead tr { border-bottom: 1px solid var(--border-2); }
+  .col-table th {
+    font-family: var(--font-mono); font-size: .58rem; font-weight: 500;
+    color: var(--text-faint); text-transform: uppercase; letter-spacing: .14em;
     padding: .65rem 1rem; text-align: left;
   }
-  .data-table tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
-  .data-table tbody tr:last-child { border-bottom: none; }
-  .data-table tbody tr:hover { background: var(--surface-2); }
-  .data-table td { padding: .75rem 1rem; color: var(--text-muted); vertical-align: middle; }
-  .col-name { font-family: var(--mono); font-size: .8rem; font-weight: 500; }
-  .col-name.used   { color: var(--accent); }
+  .col-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background .13s;
+  }
+  .col-table tbody tr:last-child { border-bottom: none; }
+  .col-table tbody tr:hover { background: var(--surface-2); }
+  .col-table td { padding: .85rem 1rem; color: var(--text-muted); vertical-align: middle; }
+
+  .col-name {
+    font-family: var(--font-mono); font-size: .78rem; font-weight: 500;
+  }
+  .col-name.used   { color: var(--accent-text); }
   .col-name.unused { color: var(--text-faint); }
   .col-type {
-    font-family: var(--mono); font-size: .74rem; color: var(--text-faint);
-    background: var(--surface-2); border: 1px solid var(--border);
-    border-radius: 4px; padding: .15rem .5rem; display: inline-block;
+    font-family: var(--font-mono); font-size: .67rem;
+    color: var(--text-faint);
+    background: var(--surface-3); border: 1px solid var(--border);
+    border-radius: var(--r-xs); padding: .1rem .5rem;
+    display: inline-block;
   }
-  .status-badge {
+  .status-pill {
     display: inline-flex; align-items: center; gap: .35rem;
-    font-size: .72rem; font-weight: 500; border-radius: 5px; padding: .2rem .6rem;
+    font-family: var(--font-mono); font-size: .62rem; font-weight: 500;
+    border-radius: var(--r-xs); padding: .18rem .6rem;
+    white-space: nowrap;
   }
-  .status-badge.yes { background: var(--safe-bg);   color: var(--accent); border: 1px solid var(--safe-border); }
-  .status-badge.no  { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+  .status-pill.yes { background: var(--accent-glass); color: var(--accent-text); border: 1px solid rgba(16,209,124,.2); }
+  .status-pill.no  { background: var(--surface-3); color: var(--text-faint); border: 1px solid var(--border-2); }
 
-  /* ── Preprocessing Steps ── */
-  .prep-list { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
-  .prep-list li {
-    display: flex; align-items: flex-start; gap: .9rem;
-    font-size: .86rem; color: var(--text-muted); line-height: 1.65;
-    padding: .8rem 1.1rem; background: var(--surface-2);
-    border: 1px solid var(--border); border-radius: 9px;
-    transition: border-color .18s;
+  /* ── Preprocessing pipeline ─────────────────────────────── */
+  .prep-steps {
+    display: flex; flex-direction: column; gap: 0;
+    position: relative;
   }
-  .prep-list li:hover { border-color: var(--border-strong); }
-  .step-num {
-    width: 24px; height: 24px;
-    background: var(--accent-light); border: 1px solid var(--safe-border);
-    border-radius: 6px; flex-shrink: 0; margin-top: .05rem;
+  /* Vertical connector line */
+  .prep-steps::before {
+    content: '';
+    position: absolute; left: 11px; top: 24px; bottom: 24px;
+    width: 1px; background: var(--border-2);
+    pointer-events: none;
+  }
+  .prep-step {
+    display: flex; align-items: flex-start; gap: 1rem;
+    padding: .85rem 0;
+    position: relative;
+  }
+  .prep-step:last-child { padding-bottom: 0; }
+  .prep-num {
+    width: 23px; height: 23px; flex-shrink: 0;
+    background: var(--surface-2);
+    border: 1px solid var(--border-2);
+    border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-family: var(--mono); font-size: .68rem; font-weight: 500; color: var(--accent);
+    font-family: var(--font-mono); font-size: .6rem; font-weight: 500;
+    color: var(--text-muted);
+    position: relative; z-index: 1;
+    transition: background .2s, color .2s, border-color .2s;
+    margin-top: .05rem;
   }
-  code {
-    font-family: var(--mono); font-size: .78rem; color: var(--accent);
-    background: var(--accent-light); border: 1px solid var(--safe-border);
-    border-radius: 4px; padding: .1rem .45rem;
+  .prep-step:hover .prep-num {
+    background: var(--accent-glass);
+    border-color: rgba(16,209,124,.3);
+    color: var(--accent-text);
+  }
+  .prep-content {
+    padding-top: .05rem; flex: 1;
+  }
+  .prep-title {
+    font-size: .84rem; font-weight: 600;
+    color: var(--text-2); margin-bottom: .2rem;
+    letter-spacing: -.01em;
+    font-family: var(--font-display);
+  }
+  .prep-desc {
+    font-size: .8rem; color: var(--text-muted); line-height: 1.75;
+  }
+  .prep-desc code {
+    font-family: var(--font-mono); font-size: .72rem;
+    color: var(--accent-text);
+    background: var(--accent-glass);
+    border: 1px solid rgba(16,209,124,.12);
+    border-radius: 3px; padding: .06rem .4rem;
   }
 
-  /* ── Responsive ── */
+  /* ── Mobile ─────────────────────────────────────────────── */
   @media (max-width: 860px) {
-    .label-count { display: none; }
-    .label-name  { width: 72px; }
+    .ov-grid       { grid-template-columns: repeat(3, 1fr); }
+    .samples-grid  { grid-template-columns: 1fr; }
+    .label-row     { grid-template-columns: 80px 1fr 48px; }
+    .label-count   { display: none; }
+    .prep-steps::before { left: 10px; }
+  }
+  @media (max-width: 520px) {
+    .ov-grid { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 {% endblock %}
@@ -139,92 +214,112 @@
 
 {% block content %}
 
-<!-- ── Page Header ──────────────────────────── -->
+<!-- ── Page header ─────────────────────────────────────────── -->
 <div class="page-header">
-  <div class="page-badge">
-    <i class="fa-solid fa-database" style="font-size:.6rem"></i>
-    Training Data
+  <div class="page-header-rule">
+    <span class="page-eyebrow">Training Data</span>
   </div>
   <h1>
-    <span class="word-green">Training</span><br>
-    <span class="word-ghost">Dataset</span>
+    Training <span class="hl">Data</span><span class="serif">set</span>
   </h1>
-  <p>Dataset_5971.csv — 5,971 labeled SMS messages used to train and evaluate the model.</p>
+  <p>Dataset_5971.csv — 5,971 labelled SMS messages used to train and evaluate the smishing classifier.</p>
 </div>
 
 <div class="content-wrap">
 
-  <!-- Overview -->
-  <div class="section-card">
-    <div class="section-label">
-      <i class="fa-solid fa-database"></i>
+  <!-- ── Dataset Overview ──────────────────────────────────── -->
+  <div class="card">
+    <div class="s-label">
+      <span class="s-num">01</span>
       Dataset Overview
     </div>
-    <div class="overview-grid">
-      <div class="ov-tile"><div class="ov-num">5,971</div><div class="ov-name">Total Messages</div></div>
-      <div class="ov-tile"><div class="ov-num">4,844</div><div class="ov-name">Legitimate (Ham)</div></div>
-      <div class="ov-tile"><div class="ov-num">1,127</div><div class="ov-name">Threat (Spam/Smishing)</div></div>
-      <div class="ov-tile"><div class="ov-num">5</div><div class="ov-name">Original Labels</div></div>
-      <div class="ov-tile"><div class="ov-num">2</div><div class="ov-name">Final Classes</div></div>
+    <div class="ov-grid">
+      <div class="ov-tile">
+        <div class="ov-num">5<span class="accent">,</span>971</div>
+        <div class="ov-name">Total messages</div>
+      </div>
+      <div class="ov-tile">
+        <div class="ov-num">4<span class="accent">,</span>844</div>
+        <div class="ov-name">Legitimate (ham)</div>
+      </div>
+      <div class="ov-tile">
+        <div class="ov-num">1<span class="accent">,</span>127</div>
+        <div class="ov-name">Threat samples</div>
+      </div>
+      <div class="ov-tile">
+        <div class="ov-num" style="font-size:1.7rem;">5</div>
+        <div class="ov-name">Original labels</div>
+      </div>
+      <div class="ov-tile">
+        <div class="ov-num" style="font-size:1.7rem;">2</div>
+        <div class="ov-name">Final classes</div>
+      </div>
     </div>
   </div>
 
-  <!-- Label Distribution -->
-  <div class="section-card">
-    <div class="section-label">
-      <i class="fa-solid fa-chart-pie"></i>
+  <!-- ── Label Distribution ────────────────────────────────── -->
+  <div class="card">
+    <div class="s-label">
+      <span class="s-num">02</span>
       Label Distribution
     </div>
-    <div id="labelChart"></div>
+    <div class="label-table" id="labelChart" role="list" aria-label="Label distribution chart"></div>
   </div>
 
-  <!-- Sample Messages -->
-  <div class="section-card">
-    <div class="section-label">
-      <i class="fa-solid fa-comment-dots"></i>
+  <!-- ── Sample Messages ───────────────────────────────────── -->
+  <div class="card">
+    <div class="s-label">
+      <span class="s-num">03</span>
       Sample Messages
     </div>
-    <div class="sample-grid">
+    <div class="samples-grid">
+
       <div class="sample-card">
-        <span class="sample-badge ham">Ham</span>
-        <div class="sample-text">Your opinion about me? 1. Over 2. Jada 3. Kusr ... reply with the number</div>
+        <div class="sample-meta"><span class="s-badge ham">Ham</span></div>
+        <div class="sample-text">Your opinion about me? 1. Over 2. Jada 3. Kusr — reply with the number.</div>
       </div>
+
       <div class="sample-card">
-        <span class="sample-badge ham">Ham</span>
+        <div class="sample-meta"><span class="s-badge threat">Smishing</span></div>
+        <div class="sample-text">Please Stay At Home. To encourage staying home, we are giving away £150 Amazon vouchers. Claim yours now…</div>
+      </div>
+
+      <div class="sample-card">
+        <div class="sample-meta"><span class="s-badge ham">Ham</span></div>
         <div class="sample-text">What's up? Do you want me to come online? If yes, bring the book.</div>
       </div>
+
       <div class="sample-card">
-        <span class="sample-badge threat">Smishing</span>
-        <div class="sample-text">Please Stay At Home. To encourage the notion of staying home, we are giving away £150 Amazon vouchers…</div>
+        <div class="sample-meta"><span class="s-badge spam">Spam</span></div>
+        <div class="sample-text">Ur cash-balance is currently 500 pounds — to maximise ur cash-in now send CASH to 86688. Only 150p/msg.</div>
       </div>
+
       <div class="sample-card">
-        <span class="sample-badge spam">Spam</span>
-        <div class="sample-text">Ur cash-balance is currently 500 pounds - to maximize ur cash-in now send CASH to 86688 only 150p/msg. CC: 08718720201</div>
+        <div class="sample-meta"><span class="s-badge threat">Smishing</span></div>
+        <div class="sample-text">4mths half price Orange line rental &amp; latest camera phones 4 FREE. Had your phone 11mths+? Call MobilesDirect free on 08000938768 now!</div>
       </div>
+
       <div class="sample-card">
-        <span class="sample-badge threat">Smishing</span>
-        <div class="sample-text">4mths half price Orange line rental &amp; latest camera phones 4 FREE. Had your phone 11mths+? Call MobilesDirect free on 08000938768 to update now!</div>
-      </div>
-      <div class="sample-card">
-        <span class="sample-badge ham">Ham</span>
+        <div class="sample-meta"><span class="s-badge ham">Ham</span></div>
         <div class="sample-text">Also sir, I sent you an email about how to log in to the portal. Please check whenever convenient.</div>
       </div>
+
     </div>
   </div>
 
-  <!-- Dataset Columns -->
-  <div class="section-card">
-    <div class="section-label">
-      <i class="fa-solid fa-table-columns"></i>
+  <!-- ── Dataset Columns ───────────────────────────────────── -->
+  <div class="card">
+    <div class="s-label">
+      <span class="s-num">04</span>
       Dataset Columns
     </div>
-    <div style="overflow-x:auto">
-      <table class="data-table">
+    <div style="overflow-x: auto;">
+      <table class="col-table">
         <thead>
           <tr>
             <th>Column</th>
             <th>Type</th>
-            <th>Used</th>
+            <th>Status</th>
             <th>Description</th>
           </tr>
         </thead>
@@ -232,31 +327,31 @@
           <tr>
             <td><span class="col-name used">LABEL</span></td>
             <td><span class="col-type">category</span></td>
-            <td><span class="status-badge yes"><i class="fa-solid fa-check" style="font-size:.6rem"></i> Yes</span></td>
+            <td><span class="status-pill yes"><i class="fa-solid fa-check" style="font-size:.5rem" aria-hidden="true"></i> Used</span></td>
             <td>Original label: ham, spam, Spam, Smishing, smishing</td>
           </tr>
           <tr>
             <td><span class="col-name used">TEXT</span></td>
             <td><span class="col-type">string</span></td>
-            <td><span class="status-badge yes"><i class="fa-solid fa-check" style="font-size:.6rem"></i> Yes</span></td>
-            <td>The raw SMS message content — primary feature</td>
+            <td><span class="status-pill yes"><i class="fa-solid fa-check" style="font-size:.5rem" aria-hidden="true"></i> Used</span></td>
+            <td>Raw SMS message content — primary model feature</td>
           </tr>
           <tr>
             <td><span class="col-name unused">URL</span></td>
             <td><span class="col-type">binary</span></td>
-            <td><span class="status-badge no"><i class="fa-solid fa-xmark" style="font-size:.6rem"></i> Dropped</span></td>
-            <td>Whether a URL is present (yes/No)</td>
+            <td><span class="status-pill no"><i class="fa-solid fa-xmark" style="font-size:.5rem" aria-hidden="true"></i> Dropped</span></td>
+            <td>Whether a URL is present in the message</td>
           </tr>
           <tr>
             <td><span class="col-name unused">EMAIL</span></td>
             <td><span class="col-type">binary</span></td>
-            <td><span class="status-badge no"><i class="fa-solid fa-xmark" style="font-size:.6rem"></i> Dropped</span></td>
+            <td><span class="status-pill no"><i class="fa-solid fa-xmark" style="font-size:.5rem" aria-hidden="true"></i> Dropped</span></td>
             <td>Whether an email address is present</td>
           </tr>
           <tr>
             <td><span class="col-name unused">PHONE</span></td>
             <td><span class="col-type">binary</span></td>
-            <td><span class="status-badge no"><i class="fa-solid fa-xmark" style="font-size:.6rem"></i> Dropped</span></td>
+            <td><span class="status-pill no"><i class="fa-solid fa-xmark" style="font-size:.5rem" aria-hidden="true"></i> Dropped</span></td>
             <td>Whether a phone number is present</td>
           </tr>
         </tbody>
@@ -264,77 +359,101 @@
     </div>
   </div>
 
-  <!-- Preprocessing Steps -->
-  <div class="section-card">
-    <div class="section-label">
-      <i class="fa-solid fa-gears"></i>
-      Preprocessing Steps
+  <!-- ── Preprocessing Pipeline ───────────────────────────── -->
+  <div class="card">
+    <div class="s-label">
+      <span class="s-num">05</span>
+      Preprocessing Pipeline
     </div>
-    <ul class="prep-list">
-      <li>
-        <span class="step-num">1</span>
-        Normalize label casing: <code>str.lower().str.strip()</code> so "Smishing", "smishing" → "smishing"
-      </li>
-      <li>
-        <span class="step-num">2</span>
-        Map labels to binary target: ham → 0, spam/smishing → 1
-      </li>
-      <li>
-        <span class="step-num">3</span>
-        Drop rows where target is NaN (unknown label variants)
-      </li>
-      <li>
-        <span class="step-num">4</span>
-        Drop URL, EMAIL, PHONE columns — text alone suffices for high accuracy
-      </li>
-      <li>
-        <span class="step-num">5</span>
-        80/20 stratified train-test split to preserve class ratio
-      </li>
-      <li>
-        <span class="step-num">6</span>
-        Fit TF-IDF vectorizer on training set; transform both splits
-      </li>
-    </ul>
+    <div class="prep-steps" role="list">
+
+      <div class="prep-step" role="listitem">
+        <div class="prep-num" aria-hidden="true">1</div>
+        <div class="prep-content">
+          <div class="prep-title">Normalise label casing</div>
+          <div class="prep-desc">Apply <code>str.lower().str.strip()</code> so variants like "Smishing" and "smishing" collapse to a single canonical form.</div>
+        </div>
+      </div>
+
+      <div class="prep-step" role="listitem">
+        <div class="prep-num" aria-hidden="true">2</div>
+        <div class="prep-content">
+          <div class="prep-title">Map to binary target</div>
+          <div class="prep-desc">Encode labels: <code>ham → 0</code>, all spam and smishing variants <code>→ 1</code>. Reduces 5 classes to a clean binary classification task.</div>
+        </div>
+      </div>
+
+      <div class="prep-step" role="listitem">
+        <div class="prep-num" aria-hidden="true">3</div>
+        <div class="prep-content">
+          <div class="prep-title">Drop unknown rows</div>
+          <div class="prep-desc">Remove any rows where the binary target is <code>NaN</code> — these correspond to unrecognised label variants not in the mapping.</div>
+        </div>
+      </div>
+
+      <div class="prep-step" role="listitem">
+        <div class="prep-num" aria-hidden="true">4</div>
+        <div class="prep-content">
+          <div class="prep-title">Drop structural columns</div>
+          <div class="prep-desc">Discard URL, EMAIL, and PHONE columns. Text content alone achieves over 98% accuracy, making these redundant.</div>
+        </div>
+      </div>
+
+      <div class="prep-step" role="listitem">
+        <div class="prep-num" aria-hidden="true">5</div>
+        <div class="prep-content">
+          <div class="prep-title">Stratified train-test split</div>
+          <div class="prep-desc">80/20 split with <code>stratify=y</code> to preserve the natural class imbalance (~81% ham) in both train and test sets.</div>
+        </div>
+      </div>
+
+      <div class="prep-step" role="listitem">
+        <div class="prep-num" aria-hidden="true">6</div>
+        <div class="prep-content">
+          <div class="prep-title">TF-IDF vectorisation</div>
+          <div class="prep-desc">Fit vectoriser on training set only, then <code>transform</code> both splits. Prevents data leakage from the test distribution.</div>
+        </div>
+      </div>
+
+    </div>
   </div>
 
-</div><!-- /content-wrap -->
+</div>
 {% endblock %}
 
 
 {% block scripts %}
 <script>
-  const labels = [
-    { name: 'ham',      count: 4844, pct: 81.1, color: '#0f9f5c' },
-    { name: 'Smishing', count:  616, pct: 10.3, color: '#c93030' },
-    { name: 'spam',     count:  466, pct:  7.8, color: '#b06000' },
-    { name: 'Spam',     count:   23, pct:  0.4, color: '#b06000' },
-    { name: 'smishing', count:   22, pct:  0.4, color: '#c93030' },
+(function() {
+  var labels = [
+    { name: 'ham',      count: 4844, pct: 81.1, color: 'var(--accent-text)' },
+    { name: 'Smishing', count:  616, pct: 10.3, color: 'var(--danger)' },
+    { name: 'spam',     count:  466, pct:  7.8, color: 'var(--warn)' },
+    { name: 'Spam',     count:   23, pct:   0.4, color: 'var(--warn)' },
+    { name: 'smishing', count:   22, pct:   0.4, color: 'var(--danger)' },
   ];
 
-  const chart = document.getElementById('labelChart');
+  var chart = document.getElementById('labelChart');
 
-  labels.forEach(l => {
-    const row = document.createElement('div');
+  labels.forEach(function(l) {
+    var row = document.createElement('div');
     row.className = 'label-row';
-    row.innerHTML = `
-      <div class="label-name" style="color:${l.color}">${l.name}</div>
-      <div class="label-track">
-        <div class="label-fill"
-             style="background:${l.color};opacity:.8;width:0"
-             data-w="${l.pct}%">
-        </div>
-      </div>
-      <div class="label-count">${l.count.toLocaleString()}</div>
-      <div class="label-pct" style="color:${l.color}">${l.pct}%</div>
-    `;
+    row.setAttribute('role', 'listitem');
+    row.innerHTML =
+      '<div class="label-name" style="color:' + l.color + '">' + l.name + '</div>' +
+      '<div class="label-track">' +
+        '<div class="label-fill" style="background:' + l.color + ';opacity:.7;width:0" data-w="' + l.pct + '%"></div>' +
+      '</div>' +
+      '<div class="label-count">' + l.count.toLocaleString() + '</div>' +
+      '<div class="label-pct" style="color:' + l.color + '">' + l.pct + '%</div>';
     chart.appendChild(row);
   });
 
-  setTimeout(() => {
-    document.querySelectorAll('.label-fill').forEach(b => {
-      b.style.width = b.dataset.w;
+  setTimeout(function() {
+    document.querySelectorAll('.label-fill').forEach(function(bar) {
+      bar.style.width = bar.dataset.w;
     });
-  }, 200);
+  }, 180);
+})();
 </script>
 {% endblock %}

@@ -1,186 +1,248 @@
 {% extends "base.html" %}
 
-{% block title %}SmishGuard AI — Model{% endblock %}
-
+{% block title %}SmishGuard AI — Model Architecture{% endblock %}
 
 {% block head_extra %}
 <style>
 
-  /* ── Pipeline ── */
+  /* ── Pipeline ───────────────────────────────────────────── */
   .pipeline {
-    display: flex;
-    gap: 0;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    position: relative;
   }
   .pipe-step {
-    flex: 1; min-width: 130px;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 1.75rem 1rem 1.5rem;
+    text-align: center;
     background: var(--surface-2);
     border: 1px solid var(--border);
-    padding: 1.25rem 1rem;
-    text-align: center;
+    border-right: none;
     position: relative;
-    transition: background .2s, border-color .2s;
     cursor: default;
+    transition: background .2s, border-color .2s;
   }
-  .pipe-step:hover {
-    background: var(--accent-light);
-    border-color: var(--safe-border);
-  }
-  .pipe-step:first-child { border-radius: 10px 0 0 10px; }
-  .pipe-step:last-child  { border-radius: 0 10px 10px 0; }
+  .pipe-step:first-child { border-radius: var(--r) 0 0 var(--r); }
+  .pipe-step:last-child  { border-right: 1px solid var(--border); border-radius: 0 var(--r) var(--r) 0; }
+  .pipe-step:hover { background: var(--surface-3); border-color: var(--border-2); }
+  .pipe-step:hover + .pipe-step { border-left-color: var(--border-2); }
+  .pipe-step:hover .pipe-icon-wrap { background: var(--accent-glass); border-color: rgba(16,209,124,.25); color: var(--accent-text); }
+
+  /* Arrow connector */
   .pipe-step:not(:last-child)::after {
-    content: '→';
-    position: absolute;
-    right: -12px; top: 50%;
+    content: '';
+    position: absolute; right: -8px; top: 50%;
     transform: translateY(-50%);
-    font-family: var(--mono);
-    font-size: .85rem;
-    color: var(--accent);
-    background: var(--surface);
-    padding: 0 2px;
-    z-index: 2;
-  }
-  [data-theme="dark"] .pipe-step:not(:last-child)::after {
+    width: 14px; height: 14px;
     background: var(--surface-2);
+    border-top: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    rotate: 45deg;
+    z-index: 2;
+    transition: background .2s;
   }
-  .pipe-icon {
-    font-size: 1.2rem; color: var(--accent); margin-bottom: .55rem;
+  .pipe-step:hover::after { background: var(--surface-3); }
+
+  .pipe-step-num {
+    font-family: var(--font-mono); font-size: .52rem; font-weight: 500;
+    color: var(--text-faint); letter-spacing: .1em; text-transform: uppercase;
+    margin-bottom: .75rem;
+  }
+  .pipe-icon-wrap {
+    width: 36px; height: 36px;
+    background: var(--surface-3);
+    border: 1px solid var(--border-2);
+    border-radius: var(--r-sm);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); font-size: .82rem;
+    margin-bottom: .9rem;
+    transition: background .2s, color .2s, border-color .2s;
   }
   .pipe-name {
-    font-family: var(--mono); font-size: .72rem; font-weight: 500;
-    color: var(--text); margin-bottom: .25rem;
+    font-family: var(--font-mono); font-size: .68rem; font-weight: 500;
+    color: var(--text-2); margin-bottom: .35rem;
+    letter-spacing: .04em;
   }
-  .pipe-desc { font-size: .65rem; color: var(--text-muted); line-height: 1.5; }
+  .pipe-desc {
+    font-size: .68rem; color: var(--text-faint); line-height: 1.6;
+  }
 
-  /* ── Metrics Grid ── */
+  /* ── Metrics grid ───────────────────────────────────────── */
   .metrics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: .85rem;
+    grid-template-columns: repeat(5, 1fr);
+    gap: .75rem;
   }
   .metric-tile {
-    background: var(--surface-2); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 1.4rem 1rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 1.5rem 1rem 1.25rem;
     text-align: center;
-    transition: transform .2s, box-shadow .2s, border-color .2s;
+    position: relative; overflow: hidden;
+    transition: border-color .2s, transform .2s;
+    cursor: default;
   }
-  .metric-tile:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--safe-border);
+  .metric-tile::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    transform: scaleX(0); transform-origin: center;
+    transition: transform .3s;
   }
+  .metric-tile:hover { border-color: var(--border-2); transform: translateY(-2px); }
+  .metric-tile:hover::after { transform: scaleX(1); }
   .metric-num {
-    font-family: var(--display); font-size: 2rem; font-weight: 900;
-    color: var(--accent); line-height: 1; letter-spacing: -.01em;
+    font-family: var(--font-display);
+    font-size: 1.9rem; font-weight: 700;
+    color: var(--text); line-height: 1;
+    letter-spacing: -.04em;
+    margin-bottom: .5rem;
   }
-  .metric-name {
-    font-size: .7rem; font-weight: 600; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: .1em; margin-top: .4rem;
+  .metric-num .acc { color: var(--accent-text); }
+  .metric-label {
+    font-family: var(--font-mono); font-size: .58rem; font-weight: 400;
+    color: var(--text-faint); text-transform: uppercase; letter-spacing: .14em;
   }
-  .metric-note { font-size: .65rem; color: var(--text-faint); margin-top: .2rem; }
+  .metric-note {
+    font-size: .68rem; color: var(--text-faint);
+    margin-top: .25rem; font-family: var(--font-mono);
+  }
 
-  /* ── Comparison Chart ── */
-  .comparison-row {
-    display: flex; align-items: center; gap: 1.1rem;
-    padding: .9rem 0;
+  /* ── Model comparison ───────────────────────────────────── */
+  .comp-table {
+    display: flex; flex-direction: column;
+    gap: 0;
+  }
+  .comp-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 60px;
+    align-items: center; gap: 1.25rem;
+    padding: 1rem 0;
     border-bottom: 1px solid var(--border);
   }
-  .comparison-row:last-child { border-bottom: none; }
-  .model-name-col {
-    font-family: var(--mono); font-size: .78rem;
-    color: var(--text-muted); width: 200px; flex-shrink: 0;
-    display: flex; align-items: center; gap: .5rem;
+  .comp-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .comp-row:first-child { padding-top: 0; }
+  .comp-name {
+    display: flex; align-items: center; gap: .6rem;
+    font-family: var(--font-mono); font-size: .75rem;
+    color: var(--text-muted);
   }
-  .model-name-col.is-winner { color: var(--accent); font-weight: 500; }
-  .bar-track {
-    flex: 1;
-    background: var(--surface-2); border: 1px solid var(--border);
-    border-radius: 6px; height: 8px; overflow: hidden;
+  .comp-name.is-winner { color: var(--text-2); }
+  .comp-track {
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: 100px; height: 6px; overflow: hidden;
   }
-  .bar-fill {
-    height: 100%; border-radius: 6px;
-    background: var(--border-strong);
+  .comp-fill {
+    height: 100%; border-radius: 100px;
+    background: var(--surface-4);
     transition: width 1s cubic-bezier(.22,.61,.36,1);
   }
-  .bar-fill.is-winner { background: var(--accent); }
-  .acc-label {
-    font-family: var(--mono); font-size: .78rem;
-    width: 52px; text-align: right; color: var(--text-faint);
+  .comp-fill.is-winner {
+    background: linear-gradient(90deg, var(--accent-dim), var(--accent));
   }
-  .acc-label.is-winner { color: var(--accent); font-weight: 500; }
+  .comp-pct {
+    font-family: var(--font-mono); font-size: .75rem;
+    color: var(--text-faint); text-align: right;
+  }
+  .comp-pct.is-winner { color: var(--accent-text); font-weight: 500; }
   .winner-badge {
-    font-family: var(--mono); font-size: .58rem;
-    background: var(--accent-light); color: var(--accent);
-    border: 1px solid var(--safe-border);
-    border-radius: 4px; padding: .1rem .4rem;
-    letter-spacing: .04em; text-transform: uppercase;
+    font-family: var(--font-mono); font-size: .52rem; font-weight: 500;
+    background: var(--accent-glass);
+    color: var(--accent-text);
+    border: 1px solid rgba(16,209,124,.2);
+    border-radius: var(--r-xs);
+    padding: .1rem .42rem;
+    text-transform: uppercase; letter-spacing: .08em;
+    flex-shrink: 0;
   }
 
-  /* ── Code Block ── */
-  .code-wrap {
-    background: var(--surface-2); border: 1px solid var(--border);
-    border-radius: 10px; overflow: hidden;
+  /* ── TF-IDF config — visual params ─────────────────────── */
+  .param-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: .65rem;
   }
-  .code-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: .6rem 1.2rem;
-    background: var(--surface-3); border-bottom: 1px solid var(--border);
+  .param-row {
+    display: flex; flex-direction: column; gap: .3rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: .9rem 1rem;
+    transition: border-color .15s;
   }
-  .code-lang {
-    font-family: var(--mono); font-size: .65rem;
-    color: var(--text-faint); letter-spacing: .1em; text-transform: uppercase;
+  .param-row:hover { border-color: var(--border-2); }
+  .param-key {
+    font-family: var(--font-mono); font-size: .62rem; font-weight: 500;
+    color: var(--accent-text); letter-spacing: .04em;
   }
-  .code-dots { display: flex; gap: .4rem; }
-  .code-dot { width: 10px; height: 10px; border-radius: 50%; }
-  .code-dot.r { background: #ff5f57; }
-  .code-dot.y { background: #febc2e; }
-  .code-dot.g { background: #28c840; }
+  .param-val {
+    font-family: var(--font-display); font-size: 1.1rem; font-weight: 600;
+    color: var(--text); letter-spacing: -.02em; line-height: 1;
+  }
+  .param-desc {
+    font-size: .7rem; color: var(--text-faint);
+    line-height: 1.55; margin-top: .15rem;
+  }
 
-  /* ── Syntax colors (model page only) ── */
-  .fn  { color: var(--accent); }
-  .str-warm { color: #e08c00; }
-  .num { color: #2979d8; }
-
-  /* ── Why LinearSVC Cards ── */
+  /* ── Why LinearSVC ──────────────────────────────────────── */
   .reason-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: .85rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: .75rem;
   }
   .reason-card {
-    background: var(--surface-2); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 1.3rem 1.2rem;
-    transition: transform .2s, box-shadow .2s, border-color .2s;
+    display: flex; align-items: flex-start; gap: 1rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 1.25rem 1.3rem;
+    transition: border-color .2s, transform .15s;
   }
   .reason-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--safe-border);
+    border-color: var(--border-2);
+    transform: translateY(-1px);
   }
   .reason-icon {
-    width: 36px; height: 36px;
-    background: var(--accent-light); border: 1px solid var(--safe-border);
-    border-radius: 9px;
+    width: 32px; height: 32px; flex-shrink: 0;
+    background: var(--surface-3);
+    border: 1px solid var(--border-2);
+    border-radius: var(--r-sm);
     display: flex; align-items: center; justify-content: center;
-    color: var(--accent); font-size: .85rem; margin-bottom: .85rem;
+    color: var(--text-muted); font-size: .75rem;
+    margin-top: .1rem;
+    transition: background .2s, color .2s, border-color .2s;
+  }
+  .reason-card:hover .reason-icon {
+    background: var(--accent-glass);
+    border-color: rgba(16,209,124,.2);
+    color: var(--accent-text);
   }
   .reason-title {
-    font-size: .88rem; font-weight: 700; color: var(--text);
-    margin-bottom: .35rem; letter-spacing: -.01em;
+    font-family: var(--font-display);
+    font-size: .88rem; font-weight: 600;
+    color: var(--text); margin-bottom: .3rem;
+    letter-spacing: -.01em;
   }
-  .reason-desc { font-size: .8rem; color: var(--text-muted); line-height: 1.65; }
+  .reason-desc {
+    font-size: .8rem; color: var(--text-muted); line-height: 1.75;
+  }
 
-  /* ── Responsive ── */
+  /* ── Mobile ─────────────────────────────────────────────── */
   @media (max-width: 860px) {
-    .pipeline { flex-direction: column; }
-    .pipe-step { border-radius: 0 !important; min-width: unset; }
-    .pipe-step:first-child { border-radius: 10px 10px 0 0 !important; }
-    .pipe-step:last-child  { border-radius: 0 0 10px 10px !important; }
-    .pipe-step:not(:last-child)::after {
-      content: '↓'; right: 50%; top: unset;
-      bottom: -14px; transform: translateX(50%);
-    }
-    .model-name-col { width: 130px; font-size: .72rem; }
+    .pipeline { grid-template-columns: 1fr; }
+    .pipe-step { border-right: 1px solid var(--border); border-bottom: none; border-radius: 0; }
+    .pipe-step:first-child { border-radius: var(--r) var(--r) 0 0; }
+    .pipe-step:last-child  { border-bottom: 1px solid var(--border); border-radius: 0 0 var(--r) var(--r); }
+    .pipe-step::after { display: none; }
+    .metrics-grid { grid-template-columns: repeat(3, 1fr); }
+    .comp-row { grid-template-columns: 140px 1fr 52px; }
+    .reason-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 520px) {
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    .comp-row { grid-template-columns: 110px 1fr 48px; gap: .75rem; }
   }
 </style>
 {% endblock %}
@@ -188,172 +250,212 @@
 
 {% block content %}
 
-<!-- ── Page Header ──────────────────────────── -->
+<!-- ── Page header ─────────────────────────────────────────── -->
 <div class="page-header">
-  <div class="page-badge">
-    <i class="fa-solid fa-microchip" style="font-size:.6rem"></i>
-    Model Architecture
+  <div class="page-header-rule">
+    <span class="page-eyebrow">Model Architecture</span>
   </div>
   <h1>
-    <span class="word-green">Model</span><br>
-    <span class="word-ghost">Architecture</span>
+    Model <span class="hl">Arch</span><span class="serif">itecture</span>
   </h1>
   <p>LinearSVC + TF-IDF — trained, evaluated, and deployed for real-time smishing detection.</p>
 </div>
 
 <div class="content-wrap">
 
-  <!-- Pipeline -->
-  <div class="section-card">
-    <div class="section-label">
-      <i class="fa-solid fa-diagram-project"></i>
+  <!-- ── Processing Pipeline ──────────────────────────────── -->
+  <div class="card">
+    <div class="s-label">
+      <span class="s-num">01</span>
       Processing Pipeline
     </div>
     <div class="pipeline">
+
       <div class="pipe-step">
-        <div class="pipe-icon"><i class="fa-solid fa-message"></i></div>
+        <div class="pipe-step-num">Step 01</div>
+        <div class="pipe-icon-wrap" aria-hidden="true"><i class="fa-solid fa-message"></i></div>
         <div class="pipe-name">Raw SMS</div>
-        <div class="pipe-desc">User input text, up to 1600 chars</div>
+        <div class="pipe-desc">User input up to 1,600 characters</div>
       </div>
+
       <div class="pipe-step">
-        <div class="pipe-icon"><i class="fa-solid fa-broom"></i></div>
+        <div class="pipe-step-num">Step 02</div>
+        <div class="pipe-icon-wrap" aria-hidden="true"><i class="fa-solid fa-broom"></i></div>
         <div class="pipe-name">Cleaning</div>
         <div class="pipe-desc">Lowercase, strip punctuation, remove noise</div>
       </div>
+
       <div class="pipe-step">
-        <div class="pipe-icon"><i class="fa-solid fa-table-cells"></i></div>
+        <div class="pipe-step-num">Step 03</div>
+        <div class="pipe-icon-wrap" aria-hidden="true"><i class="fa-solid fa-table-cells"></i></div>
         <div class="pipe-name">TF-IDF</div>
-        <div class="pipe-desc">Vectorize into weighted term-frequency features</div>
+        <div class="pipe-desc">Weighted term-frequency features</div>
       </div>
+
       <div class="pipe-step">
-        <div class="pipe-icon"><i class="fa-solid fa-brain"></i></div>
+        <div class="pipe-step-num">Step 04</div>
+        <div class="pipe-icon-wrap" aria-hidden="true"><i class="fa-solid fa-brain"></i></div>
         <div class="pipe-name">LinearSVC</div>
-        <div class="pipe-desc">Binary classification: ham vs threat</div>
+        <div class="pipe-desc">Binary classification — ham vs threat</div>
       </div>
+
       <div class="pipe-step">
-        <div class="pipe-icon"><i class="fa-solid fa-flag"></i></div>
+        <div class="pipe-step-num">Step 05</div>
+        <div class="pipe-icon-wrap" aria-hidden="true"><i class="fa-solid fa-flag"></i></div>
         <div class="pipe-name">Result</div>
         <div class="pipe-desc">Legitimate or Spam / Smishing verdict</div>
       </div>
+
     </div>
   </div>
 
-  <!-- Performance Metrics -->
-  <div class="section-card">
-    <div class="section-label">
-      <i class="fa-solid fa-chart-bar"></i>
+  <!-- ── Performance Metrics ──────────────────────────────── -->
+  <div class="card">
+    <div class="s-label">
+      <span class="s-num">02</span>
       Performance Metrics
     </div>
     <div class="metrics-grid">
+
       <div class="metric-tile">
-        <div class="metric-num">98.4%</div>
-        <div class="metric-name">Accuracy</div>
+        <div class="metric-num">98<span class="acc">.4</span>%</div>
+        <div class="metric-label">Accuracy</div>
         <div class="metric-note">Overall test set</div>
       </div>
+
       <div class="metric-tile">
-        <div class="metric-num">97.8%</div>
-        <div class="metric-name">Precision</div>
+        <div class="metric-num">97<span class="acc">.8</span>%</div>
+        <div class="metric-label">Precision</div>
         <div class="metric-note">Threat class</div>
       </div>
+
       <div class="metric-tile">
-        <div class="metric-num">98.1%</div>
-        <div class="metric-name">Recall</div>
+        <div class="metric-num">98<span class="acc">.1</span>%</div>
+        <div class="metric-label">Recall</div>
         <div class="metric-note">Threat class</div>
       </div>
+
       <div class="metric-tile">
-        <div class="metric-num">97.9%</div>
-        <div class="metric-name">F1 Score</div>
+        <div class="metric-num">97<span class="acc">.9</span>%</div>
+        <div class="metric-label">F1 Score</div>
         <div class="metric-note">Weighted avg</div>
       </div>
+
       <div class="metric-tile">
-        <div class="metric-num">5-Fold</div>
-        <div class="metric-name">CV Strategy</div>
+        <div class="metric-num" style="font-size:1.5rem; letter-spacing:-.02em;">5<span class="acc">-</span>Fold</div>
+        <div class="metric-label">CV Strategy</div>
         <div class="metric-note">Cross-validation</div>
       </div>
+
     </div>
   </div>
 
-  <!-- Model Comparison -->
-  <div class="section-card">
-    <div class="section-label">
-      <i class="fa-solid fa-scale-balanced"></i>
+  <!-- ── Model Comparison ─────────────────────────────────── -->
+  <div class="card">
+    <div class="s-label">
+      <span class="s-num">03</span>
       Model Comparison
     </div>
-    <div id="comparisonChart"></div>
+    <div class="comp-table" id="compChart" role="list" aria-label="Model accuracy comparison"></div>
   </div>
 
-  <!-- TF-IDF Config -->
-  <div class="section-card">
-    <div class="section-label">
-      <i class="fa-solid fa-sliders"></i>
-      TF-IDF Vectorizer Config
+  <!-- ── TF-IDF Config ─────────────────────────────────────── -->
+  <div class="card">
+    <div class="s-label">
+      <span class="s-num">04</span>
+      TF-IDF Vectoriser Configuration
     </div>
-    <div class="code-wrap">
-      <div class="code-header">
-        <div class="code-dots">
-          <span class="code-dot r"></span>
-          <span class="code-dot y"></span>
-          <span class="code-dot g"></span>
-        </div>
-        <span class="code-lang">Python</span>
+    <div class="param-grid">
+
+      <div class="param-row">
+        <span class="param-key">stop_words</span>
+        <span class="param-val">'english'</span>
+        <span class="param-desc">Remove common English words — the, is, at, etc.</span>
       </div>
-      <pre><span class="kw">from</span> sklearn.feature_extraction.text <span class="kw">import</span> <span class="fn">TfidfVectorizer</span>
 
-vectorizer = <span class="fn">TfidfVectorizer</span>(
-    <span class="cm"># Remove English stop words (the, is, at...)</span>
-    stop_words=<span class="str-warm">'english'</span>,
+      <div class="param-row">
+        <span class="param-key">ngram_range</span>
+        <span class="param-val">(1, 2)</span>
+        <span class="param-desc">Capture both single-word and two-word token combinations</span>
+      </div>
 
-    <span class="cm"># Consider 1-gram and 2-gram token combinations</span>
-    ngram_range=(<span class="num">1</span>, <span class="num">2</span>),
+      <div class="param-row">
+        <span class="param-key">max_features</span>
+        <span class="param-val">10,000</span>
+        <span class="param-desc">Keep only the top 10,000 features by document frequency</span>
+      </div>
 
-    <span class="cm"># Keep only top 10,000 features by frequency</span>
-    max_features=<span class="num">10000</span>,
+      <div class="param-row">
+        <span class="param-key">max_df</span>
+        <span class="param-val">0.95</span>
+        <span class="param-desc">Ignore terms appearing in more than 95% of documents</span>
+      </div>
 
-    <span class="cm"># Ignore terms appearing in > 95% of docs (too common)</span>
-    max_df=<span class="num">0.95</span>,
+      <div class="param-row">
+        <span class="param-key">min_df</span>
+        <span class="param-val">2</span>
+        <span class="param-desc">Ignore terms appearing in fewer than 2 documents</span>
+      </div>
 
-    <span class="cm"># Ignore terms appearing in < 2 documents (too rare)</span>
-    min_df=<span class="num">2</span>,
-)</pre>
+      <div class="param-row">
+        <span class="param-key">analyzer</span>
+        <span class="param-val">'word'</span>
+        <span class="param-desc">Tokenise at word level, not character level</span>
+      </div>
+
     </div>
   </div>
 
-  <!-- Why LinearSVC -->
-  <div class="section-card">
-    <div class="section-label">
-      <i class="fa-solid fa-circle-info"></i>
+  <!-- ── Why LinearSVC ────────────────────────────────────── -->
+  <div class="card">
+    <div class="s-label">
+      <span class="s-num">05</span>
       Why LinearSVC?
     </div>
     <div class="reason-grid">
+
       <div class="reason-card">
-        <div class="reason-icon"><i class="fa-solid fa-bolt"></i></div>
-        <div class="reason-title">Speed</div>
-        <div class="reason-desc">Trains and infers in milliseconds — ideal for real-time SMS classification.</div>
+        <div class="reason-icon" aria-hidden="true"><i class="fa-solid fa-bolt"></i></div>
+        <div>
+          <div class="reason-title">Speed</div>
+          <div class="reason-desc">Trains and infers in milliseconds — ideal for real-time SMS classification at scale without GPU dependencies.</div>
+        </div>
       </div>
+
       <div class="reason-card">
-        <div class="reason-icon"><i class="fa-solid fa-arrows-to-dot"></i></div>
-        <div class="reason-title">High Dimensionality</div>
-        <div class="reason-desc">Excels with sparse TF-IDF matrices where feature count exceeds sample count.</div>
+        <div class="reason-icon" aria-hidden="true"><i class="fa-solid fa-arrows-to-dot"></i></div>
+        <div>
+          <div class="reason-title">High Dimensionality</div>
+          <div class="reason-desc">Excels with sparse TF-IDF matrices where feature count significantly exceeds sample count.</div>
+        </div>
       </div>
+
       <div class="reason-card">
-        <div class="reason-icon"><i class="fa-solid fa-chart-line"></i></div>
-        <div class="reason-title">Generalization</div>
-        <div class="reason-desc">Strong regularization prevents overfitting on limited smishing samples.</div>
+        <div class="reason-icon" aria-hidden="true"><i class="fa-solid fa-chart-line"></i></div>
+        <div>
+          <div class="reason-title">Generalisation</div>
+          <div class="reason-desc">Strong L2 regularisation prevents overfitting on limited labelled smishing samples.</div>
+        </div>
       </div>
+
       <div class="reason-card">
-        <div class="reason-icon"><i class="fa-solid fa-trophy"></i></div>
-        <div class="reason-title">Best in Class</div>
-        <div class="reason-desc">Outperformed Naive Bayes, Logistic Regression, and Random Forest on this task.</div>
+        <div class="reason-icon" aria-hidden="true"><i class="fa-solid fa-trophy"></i></div>
+        <div>
+          <div class="reason-title">Best in Class</div>
+          <div class="reason-desc">Outperformed Naive Bayes, Logistic Regression, and Random Forest on this dataset by up to 3.2 pp.</div>
+        </div>
       </div>
+
     </div>
   </div>
 
-</div><!-- /content-wrap -->
+</div>
 {% endblock %}
 
 
 {% block scripts %}
 <script>
+(function() {
   const models = [
     { name: 'LinearSVC',           acc: 98.4, winner: true  },
     { name: 'Logistic Regression', acc: 97.6, winner: false },
@@ -361,31 +463,31 @@ vectorizer = <span class="fn">TfidfVectorizer</span>(
     { name: 'Naive Bayes',         acc: 95.2, winner: false },
   ];
 
-  const container = document.getElementById('comparisonChart');
+  const chart = document.getElementById('compChart');
+  const base  = 93;
 
-  models.forEach(m => {
+  models.forEach(function(m) {
+    const pct = (((m.acc - base) / (100 - base)) * 100).toFixed(1);
     const row = document.createElement('div');
-    row.className = 'comparison-row';
-    row.innerHTML = `
-      <div class="model-name-col${m.winner ? ' is-winner' : ''}">
-        ${m.name}
-        ${m.winner ? '<span class="winner-badge">Selected</span>' : ''}
-      </div>
-      <div class="bar-track">
-        <div class="bar-fill${m.winner ? ' is-winner' : ''}"
-             style="width:0"
-             data-w="${m.acc}%">
-        </div>
-      </div>
-      <div class="acc-label${m.winner ? ' is-winner' : ''}">${m.acc}%</div>
-    `;
-    container.appendChild(row);
+    row.className = 'comp-row';
+    row.setAttribute('role', 'listitem');
+    row.innerHTML =
+      '<div class="comp-name' + (m.winner ? ' is-winner' : '') + '">' +
+        m.name +
+        (m.winner ? ' <span class="winner-badge">Selected</span>' : '') +
+      '</div>' +
+      '<div class="comp-track">' +
+        '<div class="comp-fill' + (m.winner ? ' is-winner' : '') + '" style="width:0" data-w="' + pct + '%"></div>' +
+      '</div>' +
+      '<div class="comp-pct' + (m.winner ? ' is-winner' : '') + '">' + m.acc + '%</div>';
+    chart.appendChild(row);
   });
 
-  setTimeout(() => {
-    document.querySelectorAll('.bar-fill').forEach(b => {
-      b.style.width = b.dataset.w;
+  setTimeout(function() {
+    document.querySelectorAll('.comp-fill').forEach(function(bar) {
+      bar.style.width = bar.dataset.w;
     });
-  }, 200);
+  }, 180);
+})();
 </script>
 {% endblock %}
